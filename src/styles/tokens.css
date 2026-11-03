@@ -9,6 +9,7 @@
 
   --font-display: 'Chakra Petch', system-ui, sans-serif;
   --font-body: 'Inter Variable', system-ui, sans-serif;
+  --font-mono: ui-monospace, 'SF Mono', Menlo, Consolas, monospace;
 
   color-scheme: dark;
 }

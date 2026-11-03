@@ -1,0 +1,10 @@
+{
+  "$comment": "Contact page. No backend — the email opens the visitor's mail client.",
+  "heading": "Transmit a message",
+  "intro": "Questions, ideas, or just saying hi — open a channel and I'll get back to you.",
+  "email": "hello@example.com",
+  "links": [
+    { "label": "GitHub", "handle": "@Snorelaxrules", "url": "https://github.com/Snorelaxrules" },
+    { "label": "LinkedIn", "handle": "Add your profile", "url": "https://www.linkedin.com/" }
+  ]
+}

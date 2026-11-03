@@ -7,7 +7,7 @@ import { SpaceCanvas } from './scene/SpaceCanvas'
 import { useGalaxy } from './state/galaxyStore'
 import { useIntro } from './state/introStore'
 import { HomeHud } from './ui/HomeHud'
-import { SectionPanel } from './ui/SectionPanel'
+import { SectionPage } from './ui/SectionPage'
 import './ui/ui.css'
 
 export default function App() {
@@ -29,7 +29,7 @@ export default function App() {
       {phase !== 'arrived' && <IntroLayer />}
       {phase === 'arrived' && <HomeHud visible={!active} />}
       <AnimatePresence>
-        {active && docked === active.id && <SectionPanel key={active.id} cluster={active} />}
+        {active && docked === active.id && <SectionPage key={active.id} cluster={active} />}
       </AnimatePresence>
     </>
   )

@@ -1,0 +1,24 @@
+{
+  "$comment": "Lab entries, shown in order. links are optional; status is free text (e.g. Live, In progress, Archived).",
+  "projects": [
+    {
+      "title": "This website",
+      "year": "2026",
+      "status": "Live",
+      "description": "A personal site disguised as a spaceship: a cockpit intro with a hyperspace jump, and a galaxy map where each section is a procedurally generated star cluster.",
+      "tags": ["React", "Three.js", "React Three Fiber", "TypeScript"],
+      "links": [
+        { "label": "Visit", "url": "https://snorelaxrules.github.io" },
+        { "label": "Source", "url": "https://github.com/Snorelaxrules/snorelaxrules.github.io" }
+      ]
+    },
+    {
+      "title": "Next experiment",
+      "year": "Soon",
+      "status": "Brewing",
+      "description": "Placeholder card — add real projects to content/projects.json.",
+      "tags": ["TBD"],
+      "links": []
+    }
+  ]
+}

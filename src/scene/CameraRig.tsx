@@ -22,7 +22,7 @@ function poseFor(c: ClusterConfig | null): Pose {
   const p = new Vector3(...c.position)
   return {
     pos: p.clone().addScaledVector(DOCK_DIR, c.size * RIG.dockDistance),
-    target: p.clone().add(new Vector3(c.size * RIG.dockAimOffset, 0, 0)),
+    target: p,
     fov: RIG.dockFov,
   }
 }
@@ -35,6 +35,8 @@ const copyPose = (out: Pose, p: Pose) => {
 }
 
 const easeInOutCubic = (u: number) => (u < 0.5 ? 4 * u * u * u : 1 - (-2 * u + 2) ** 3 / 2)
+/** dive in: gentle start, accelerating into the core, short settle */
+const easeDive = (u: number) => (u < 0.85 ? 0.92 * (u / 0.85) ** 2.2 : 0.92 + 0.08 * (1 - (1 - (u - 0.85) / 0.15) ** 2))
 
 /**
  * Owns the camera: intro approach + shake, idle drift, mouse parallax, and
@@ -50,6 +52,7 @@ export function CameraRig() {
     start: 0,
     duration: 0,
     arc: 0,
+    diving: false,
     drift: 0,
     px: 0,
     py: 0,
@@ -80,7 +83,8 @@ export function CameraRig() {
         copyPose(r.to, to)
         r.start = now
         r.duration = activeId ? RIG.flyIn : RIG.flyOut
-        r.arc = r.from.pos.distanceTo(r.to.pos) * 0.08
+        r.arc = activeId ? 0 : r.from.pos.distanceTo(r.to.pos) * 0.06
+        r.diving = !!activeId
         setDocked(null)
       }
       r.key = key
@@ -89,11 +93,14 @@ export function CameraRig() {
 
     if (r.duration > 0) {
       const u = Math.min(1, (now - r.start) / r.duration)
-      const e = easeInOutCubic(u)
+      const e = r.diving ? easeDive(u) : easeInOutCubic(u)
+      // aim swings onto the cluster quickly, position follows
+      const aim = r.diving ? easeInOutCubic(Math.min(1, u * 1.6)) : e
       r.cur.pos.lerpVectors(r.from.pos, r.to.pos, e)
       r.cur.pos.y += Math.sin(Math.PI * u) * r.arc
-      r.cur.target.lerpVectors(r.from.target, r.to.target, e)
+      r.cur.target.lerpVectors(r.from.target, r.to.target, aim)
       r.cur.fov = r.from.fov + (r.to.fov - r.from.fov) * e
+      if (r.diving && u >= RIG.pageRevealAt) setDocked(activeId)
       if (u >= 1) {
         r.duration = 0
         setDocked(activeId)

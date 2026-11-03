@@ -1,0 +1,11 @@
+{
+  "$comment": "Places on the Map page. lat/lng in decimal degrees; date is free-form text.",
+  "places": [
+    { "name": "Ithaca, NY", "lat": 42.444, "lng": -76.5019, "date": "2023 – now", "note": "Placeholder — edit content/places.json." },
+    { "name": "Reykjavík, Iceland", "lat": 64.1466, "lng": -21.9426, "date": "Mar 2024", "note": "Chased the aurora; mostly found clouds." },
+    { "name": "Kyoto, Japan", "lat": 35.0116, "lng": 135.7681, "date": "Apr 2025", "note": "Temples at dawn, before the crowds." },
+    { "name": "Lisbon, Portugal", "lat": 38.7223, "lng": -9.1393, "date": "Jul 2025", "note": "Hills, trams, and too many pastéis de nata." },
+    { "name": "Cape Town, South Africa", "lat": -33.9249, "lng": 18.4241, "date": "Jan 2026", "note": "Table Mountain in the clouds." },
+    { "name": "Patagonia, Chile", "lat": -50.9423, "lng": -73.4068, "date": "Feb 2026", "note": "Wind like nowhere else." }
+  ]
+}
