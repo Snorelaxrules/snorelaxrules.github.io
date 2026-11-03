@@ -1,13 +1,11 @@
 import { useFrame } from '@react-three/fiber'
-import type { PerspectiveCamera } from 'three'
-import { ARRIVED_SAMPLE, IDLE_SAMPLE, JUMP, jitter, sampleJump } from '../intro/timeline'
+import { ARRIVED_SAMPLE, IDLE_SAMPLE, JUMP, sampleJump } from '../intro/timeline'
 import { useIntro } from '../state/introStore'
 import { WARP_DEPTH, flight } from './flight'
 
-/** Samples the jump timeline each frame and drives camera + shared flight state. */
+/** Samples the intro timeline each frame into the shared flight state. */
 export function JumpDriver() {
-  useFrame((state, delta) => {
-    const camera = state.camera as PerspectiveCamera
+  useFrame((_, delta) => {
     const { phase, startedAt, mode } = useIntro.getState()
     const s =
       phase === 'jumping'
@@ -17,19 +15,16 @@ export function JumpDriver() {
           : ARRIVED_SAMPLE
 
     const dt = Math.min(delta, 1 / 20)
+    flight.t = s.t
     flight.speed = s.speed
     flight.warp = s.warp
     flight.dust = s.dust
     flight.stretch = s.speed * JUMP.streakPerSpeed
     flight.travel = (flight.travel + s.speed * dt) % WARP_DEPTH
-
-    if (camera.fov !== s.fov) {
-      camera.fov = s.fov
-      camera.updateProjectionMatrix()
-    }
-
-    const shake = s.shake * 0.004
-    camera.rotation.set(jitter(s.t, 1) * shake, jitter(s.t, 2) * shake, jitter(s.t, 3) * shake * 0.5)
+    flight.fov = s.fov
+    flight.shake = s.shake
+    flight.reveal = s.reveal
+    flight.approach = s.approach
   })
 
   return null

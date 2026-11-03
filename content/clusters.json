@@ -1,0 +1,77 @@
+{
+  "$comment": "Galaxy map destinations. position is [x, y, z] in scene units (About sits at the origin; the home camera looks at it from +z). size is the radius. tilt is [x, z] in degrees; spin is degrees/second. kind: spiral | elliptical | globular | beacon. particles is optional.",
+  "clusters": [
+    {
+      "id": "about",
+      "label": "About",
+      "subtitle": "Who's flying this thing",
+      "route": "/about",
+      "kind": "spiral",
+      "position": [0, 0, 0],
+      "size": 18,
+      "color": "#7ae0ff",
+      "coreColor": "#ffe2b8",
+      "arms": 3,
+      "tilt": [58, 12],
+      "spin": 1.6,
+      "particles": 30000
+    },
+    {
+      "id": "writing",
+      "label": "Writing",
+      "subtitle": "Essays and notes",
+      "route": "/writing",
+      "kind": "spiral",
+      "position": [-48, 15, -24],
+      "size": 10,
+      "color": "#9db4ff",
+      "coreColor": "#f3eaff",
+      "arms": 2,
+      "tilt": [48, -24],
+      "spin": -2.4,
+      "particles": 14000
+    },
+    {
+      "id": "map",
+      "label": "Map",
+      "subtitle": "Places I've been",
+      "route": "/map",
+      "kind": "elliptical",
+      "position": [50, 11, -30],
+      "size": 10,
+      "color": "#6fd6c8",
+      "coreColor": "#e8fff6",
+      "tilt": [24, 32],
+      "spin": 1.2,
+      "particles": 12000
+    },
+    {
+      "id": "lab",
+      "label": "Lab",
+      "subtitle": "Experiments and projects",
+      "route": "/lab",
+      "kind": "globular",
+      "position": [-36, -19, 14],
+      "size": 7,
+      "color": "#ffb36b",
+      "coreColor": "#fff0dc",
+      "tilt": [0, 0],
+      "spin": 3,
+      "particles": 6000
+    },
+    {
+      "id": "contact",
+      "label": "Transmit",
+      "subtitle": "Send a message",
+      "route": "/contact",
+      "kind": "beacon",
+      "position": [40, -17, 10],
+      "size": 7.5,
+      "color": "#8fb8ff",
+      "coreColor": "#ffffff",
+      "tilt": [66, -18],
+      "spin": 4,
+      "particles": 9000
+    }
+  ]
+}

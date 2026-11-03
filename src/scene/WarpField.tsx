@@ -11,6 +11,7 @@ import {
   ShaderMaterial,
   Vector2,
 } from 'three'
+import { heading } from './rig'
 import { WARP_DEPTH, flight } from './flight'
 
 /**
@@ -162,9 +163,13 @@ export function WarpField({ count = 3500 }: { count?: number }) {
     [geometry, material],
   )
 
-  useFrame(({ gl }) => {
-    if (!ref.current) return
-    const u = ref.current.material.uniforms
+  useFrame(({ gl, camera }) => {
+    const mesh = ref.current
+    if (!mesh) return
+    // local to the ship: streaks always run along the view axis
+    mesh.position.copy(camera.position)
+    mesh.quaternion.copy(heading)
+    const u = mesh.material.uniforms
     u.uTravel.value = flight.travel
     u.uStretch.value = flight.stretch
     u.uWarp.value = flight.warp

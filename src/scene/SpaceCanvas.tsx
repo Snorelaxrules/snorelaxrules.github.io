@@ -1,6 +1,9 @@
 import { Canvas } from '@react-three/fiber'
 import { JUMP } from '../intro/timeline'
+import { CameraRig } from './CameraRig'
+import { Galaxies } from './galaxy/Galaxies'
 import { JumpDriver } from './JumpDriver'
+import { Nebula } from './Nebula'
 import { SkyDome } from './SkyDome'
 import { WarpField } from './WarpField'
 
@@ -15,7 +18,10 @@ export function SpaceCanvas() {
       >
         <color attach="background" args={['#03050b']} />
         <JumpDriver />
+        <CameraRig />
+        <Nebula />
         <SkyDome />
+        <Galaxies />
         <WarpField />
       </Canvas>
     </div>

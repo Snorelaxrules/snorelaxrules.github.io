@@ -32,6 +32,10 @@ export interface JumpSample {
   warp: number
   /** base opacity of the near-star layer */
   dust: number
+  /** 0..1 fade-in of the galaxy map */
+  reveal: number
+  /** 1 = camera is far behind the home view, 0 = arrived; we brake into the scene */
+  approach: number
   speed: number
   fov: number
   flash: number
@@ -51,6 +55,8 @@ export const IDLE_SAMPLE: JumpSample = {
   t: 0,
   warp: 0,
   dust: JUMP.dust.cruise,
+  reveal: 0,
+  approach: 1,
   speed: JUMP.speed.cruise,
   fov: JUMP.fov.rest,
   flash: 0,
@@ -63,6 +69,8 @@ export const ARRIVED_SAMPLE: JumpSample = {
   ...IDLE_SAMPLE,
   speed: JUMP.speed.arrived,
   dust: JUMP.dust.arrived,
+  reveal: 1,
+  approach: 0,
   cockpitOpacity: 0,
   done: true,
 }
@@ -75,6 +83,8 @@ export function sampleJump(t: number, mode: JumpMode): JumpSample {
       t,
       speed: mix(JUMP.speed.cruise, JUMP.speed.arrived, u),
       dust: mix(JUMP.dust.cruise, JUMP.dust.arrived, u),
+      reveal: u,
+      approach: 0,
       cockpitOpacity: 1 - u,
       done: t >= JUMP.reducedDuration,
     }
@@ -100,6 +110,9 @@ export function sampleJump(t: number, mode: JumpMode): JumpSample {
     t,
     warp,
     dust: mix(JUMP.dust.cruise, JUMP.dust.arrived, smooth(0, JUMP.duration, t)),
+    reveal: smooth(fPeak + 0.1, JUMP.duration - 0.2, t),
+    // braking distance follows the warp falloff so we glide into place
+    approach: t < d0 ? 1 : warp,
     speed: mix(base, JUMP.speed.max, warp),
     fov: mix(JUMP.fov.rest, JUMP.fov.peak, warp * warp),
     flash,
