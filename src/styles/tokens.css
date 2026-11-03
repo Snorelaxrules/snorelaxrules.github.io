@@ -1,0 +1,14 @@
+:root {
+  --bg: #04060d;
+  --bg-elev: #0a0f1e;
+  --fg: #dfe7f5;
+  --fg-muted: #8a97b0;
+  --accent: #7ae0ff;
+  --accent-warm: #ffb36b;
+  --line: rgb(122 224 255 / 0.18);
+
+  --font-display: 'Chakra Petch', system-ui, sans-serif;
+  --font-body: 'Inter Variable', system-ui, sans-serif;
+
+  color-scheme: dark;
+}
