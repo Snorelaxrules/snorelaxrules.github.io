@@ -1,0 +1,267 @@
+.cockpit {
+  position: fixed;
+  inset: 0;
+  z-index: 10;
+  pointer-events: none;
+  will-change: opacity, transform;
+}
+
+.cockpit-layer {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+}
+
+.cockpit-image {
+  object-fit: cover;
+  object-position: center bottom;
+}
+
+.cockpit-instruments text {
+  font-family: var(--font-display);
+}
+
+.ci-label {
+  font-size: 12px;
+  letter-spacing: 0.35em;
+}
+
+.ci-title {
+  font-size: 24px;
+  font-weight: 600;
+  letter-spacing: 0.4em;
+}
+
+.ci-mono {
+  font-size: 15px;
+  letter-spacing: 0.12em;
+}
+
+/* --- start lever ------------------------------------------------------- */
+
+.lever {
+  pointer-events: auto;
+  cursor: pointer;
+  outline: none;
+}
+
+.lever.is-engaged {
+  cursor: default;
+}
+
+.knob {
+  transition: transform 0.38s cubic-bezier(0.55, 0, 0.25, 1);
+}
+
+.knob-body {
+  transition: filter 0.2s;
+}
+
+.knob-glow {
+  opacity: 0.5;
+  animation: knob-pulse 2.4s ease-in-out infinite;
+  transition: opacity 0.25s;
+}
+
+.knob-label {
+  font-size: 17px;
+  font-weight: 600;
+  letter-spacing: 0.3em;
+  fill: #3a1d00;
+}
+
+.lever:not(.is-engaged):hover .knob-glow,
+.lever:focus-visible .knob-glow {
+  opacity: 1;
+  animation-play-state: paused;
+}
+
+.lever:not(.is-engaged):hover .knob-body {
+  filter: brightness(1.15);
+}
+
+.lever:not(.is-engaged):hover .knob {
+  transform: translateY(6px);
+}
+
+.lever:focus-visible .knob-body {
+  stroke: var(--accent);
+  stroke-width: 3;
+}
+
+.lever.is-engaged .knob {
+  transform: translateY(118px);
+}
+
+.lever.is-engaged .knob-glow {
+  animation: none;
+  opacity: 1;
+}
+
+.slot-light {
+  fill: var(--accent);
+  opacity: 0.1;
+  transition: opacity 0.12s calc(var(--i) * 45ms);
+}
+
+.lever.is-engaged .slot-light {
+  opacity: 0.95;
+}
+
+@keyframes knob-pulse {
+  0%,
+  100% {
+    opacity: 0.4;
+  }
+  50% {
+    opacity: 0.85;
+  }
+}
+
+/* --- instruments -------------------------------------------------------- */
+
+.radar-sweep {
+  transform-origin: 335px 770px;
+  animation: spin 3.2s linear infinite;
+}
+
+.bar {
+  transform-box: fill-box;
+  transform-origin: 50% 100%;
+  animation: bar 1.7s ease-in-out infinite alternate;
+  animation-delay: calc(var(--i) * -0.37s);
+}
+
+.blink {
+  animation: blink 2.3s steps(1) infinite;
+  animation-delay: var(--d, 0s);
+}
+
+.hud-blink {
+  animation: hud-pulse 2.2s ease-in-out infinite;
+}
+
+.cockpit.is-jumping .hud {
+  animation: hud-flicker 0.14s steps(2) infinite;
+}
+
+.cockpit.is-jumping .bar {
+  animation-duration: 0.25s;
+}
+
+.core-fill {
+  transition: width 0.4s;
+}
+
+@keyframes spin {
+  to {
+    transform: rotate(360deg);
+  }
+}
+
+@keyframes bar {
+  from {
+    transform: scaleY(0.2);
+  }
+  to {
+    transform: scaleY(1);
+  }
+}
+
+@keyframes blink {
+  0% {
+    opacity: 0.9;
+  }
+  60% {
+    opacity: 0.2;
+  }
+}
+
+@keyframes hud-pulse {
+  0%,
+  100% {
+    opacity: 0.35;
+  }
+  50% {
+    opacity: 0.8;
+  }
+}
+
+@keyframes hud-flicker {
+  50% {
+    opacity: 0.4;
+  }
+}
+
+/* --- jump overlays ------------------------------------------------------ */
+
+.jump-fx {
+  position: fixed;
+  inset: 0;
+  z-index: 20;
+  pointer-events: none;
+  opacity: 0;
+  will-change: opacity;
+}
+
+.jump-vignette {
+  background: radial-gradient(ellipse at center, transparent 35%, rgb(6 16 48 / 0.75) 100%);
+}
+
+.jump-glow {
+  mix-blend-mode: screen;
+  background: radial-gradient(
+    circle at 50% 50%,
+    rgb(230 248 255 / 0.9) 0%,
+    rgb(122 224 255 / 0.35) 4%,
+    rgb(70 120 255 / 0.1) 18%,
+    transparent 42%
+  );
+}
+
+.jump-flash {
+  background: radial-gradient(circle at 50% 50%, #ffffff 0%, #e6f7ff 35%, #9fd8ff 100%);
+}
+
+/* --- skip --------------------------------------------------------------- */
+
+.skip-intro {
+  position: fixed;
+  top: 24px;
+  right: 28px;
+  z-index: 30;
+  display: inline-flex;
+  align-items: center;
+  gap: 10px;
+  padding: 8px 14px;
+  border: 1px solid var(--line);
+  border-radius: 999px;
+  background: rgb(4 6 13 / 0.5);
+  color: var(--fg-muted);
+  font: 500 12px var(--font-display);
+  letter-spacing: 0.2em;
+  text-transform: uppercase;
+  cursor: pointer;
+  transition:
+    color 0.2s,
+    border-color 0.2s;
+}
+
+.skip-intro:hover {
+  color: var(--accent);
+  border-color: var(--accent);
+}
+
+.skip-intro kbd {
+  font: inherit;
+  font-size: 10px;
+  opacity: 0.6;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .cockpit *,
+  .cockpit *::before {
+    animation: none !important;
+  }
+}

@@ -1,25 +1,16 @@
-import { motion } from 'motion/react'
+import { AnimatePresence } from 'motion/react'
+import { ArrivalPlaceholder } from './ArrivalPlaceholder'
+import { IntroLayer } from './intro/IntroLayer'
+import { SpaceCanvas } from './scene/SpaceCanvas'
+import { useIntro } from './state/introStore'
 
 export default function App() {
+  const phase = useIntro((s) => s.phase)
   return (
-    <main
-      style={{
-        height: '100%',
-        display: 'grid',
-        placeItems: 'center',
-        background:
-          'radial-gradient(ellipse at 50% 40%, rgb(122 224 255 / 0.08), transparent 60%), var(--bg)',
-      }}
-    >
-      <motion.div
-        initial={{ opacity: 0, y: 8 }}
-        animate={{ opacity: 1, y: 0 }}
-        transition={{ duration: 0.8, ease: 'easeOut' }}
-        style={{ textAlign: 'center' }}
-      >
-        <h1 style={{ fontSize: '3rem', margin: 0, color: 'var(--accent)' }}>Talus Leong</h1>
-        <p style={{ color: 'var(--fg-muted)' }}>Systems initializing. Launch sequence pending.</p>
-      </motion.div>
-    </main>
+    <>
+      <SpaceCanvas />
+      {phase !== 'arrived' && <IntroLayer />}
+      <AnimatePresence>{phase === 'arrived' && <ArrivalPlaceholder key="arrival" />}</AnimatePresence>
+    </>
   )
 }
