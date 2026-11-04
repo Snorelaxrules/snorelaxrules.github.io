@@ -169,6 +169,7 @@ export function WarpField({ count = 3500 }: { count?: number }) {
     // local to the ship: streaks always run along the view axis
     mesh.position.copy(camera.position)
     mesh.quaternion.copy(heading)
+    mesh.visible = flight.warp > 0 || flight.dust > 0.001
     const u = mesh.material.uniforms
     u.uTravel.value = flight.travel
     u.uStretch.value = flight.stretch

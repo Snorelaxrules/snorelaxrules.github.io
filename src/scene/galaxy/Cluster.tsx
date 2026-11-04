@@ -13,7 +13,7 @@ import {
 import type { ClusterConfig } from '../../content/clusters'
 import { goTo, useGalaxy } from '../../state/galaxyStore'
 import { flight } from '../flight'
-import { damp } from '../pointer'
+import { damp, prefersReducedMotion } from '../pointer'
 import { generateCluster } from './generate'
 import { clusterFragment, clusterVertex, glowFragment, glowVertex } from './shaders'
 
@@ -91,7 +91,9 @@ export function Cluster({ cfg, interactive }: { cfg: ClusterConfig; interactive:
     u.uPixelRatio.value = gl.getPixelRatio()
     u.uHover.value = a.hover
     u.uReveal.value = a.reveal
-    points.rotation.y += (cfg.spin ?? 1) * DEG * dt
+    const reduced = prefersReducedMotion()
+    if (!reduced) points.rotation.y += (cfg.spin ?? 1) * DEG * dt
+    u.uPulse.value = cfg.kind === 'beacon' && !reduced ? 1 : 0
     points.visible = a.reveal > 0.002
 
     glow.quaternion.copy(camera.quaternion)

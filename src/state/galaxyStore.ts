@@ -1,4 +1,5 @@
 import { create } from 'zustand'
+import { webglAvailable } from '../scene/webgl'
 
 interface GalaxyState {
   /** cluster under the pointer (or focused in the nav) */
@@ -7,24 +8,30 @@ interface GalaxyState {
   activeId: string | null
   /** cluster the camera has finished flying to (panel opens when this matches activeId) */
   docked: string | null
+  /** false when WebGL is missing or the scene crashed: pages open without a flight */
+  sceneAvailable: boolean
   setHovered: (id: string | null) => void
   setActive: (id: string | null) => void
   setDocked: (id: string | null) => void
+  disableScene: () => void
 }
 
 export const useGalaxy = create<GalaxyState>()((set, get) => ({
   hovered: null,
   activeId: null,
   docked: null,
+  sceneAvailable: webglAvailable,
   setHovered: (hovered) => {
     if (get().hovered !== hovered) set({ hovered })
   },
   setActive: (activeId) => {
-    if (get().activeId !== activeId) set({ activeId, hovered: null })
+    if (get().activeId === activeId) return
+    set({ activeId, hovered: null, ...(get().sceneAvailable ? {} : { docked: activeId }) })
   },
   setDocked: (docked) => {
     if (get().docked !== docked) set({ docked })
   },
+  disableScene: () => set((s) => ({ sceneAvailable: false, docked: s.activeId })),
 }))
 
 /** Navigate without needing router context (works from inside the R3F tree). */

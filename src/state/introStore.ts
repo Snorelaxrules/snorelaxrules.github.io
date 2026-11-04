@@ -1,5 +1,6 @@
 import { create } from 'zustand'
 import type { JumpMode } from '../intro/timeline'
+import { webglAvailable } from '../scene/webgl'
 
 export type IntroPhase = 'cockpit' | 'jumping' | 'arrived'
 
@@ -30,6 +31,7 @@ function prefersReducedMotion() {
  * `?intro` forces it (handy while tuning).
  */
 function initialPhase(): IntroPhase {
+  if (!webglAvailable) return 'arrived'
   const forced = new URLSearchParams(window.location.search).has('intro')
   if (forced) return 'cockpit'
   const atRoot = ['', '#', '#/'].includes(window.location.hash)
@@ -45,6 +47,8 @@ interface IntroState {
   skip: () => void
   finish: () => void
   replay: () => void
+  /** jump straight to the galaxy (e.g. the 3D scene failed) */
+  forceArrive: () => void
 }
 
 export const useIntro = create<IntroState>()((set, get) => ({
@@ -69,4 +73,5 @@ export const useIntro = create<IntroState>()((set, get) => ({
     if (get().phase === 'jumping') set({ phase: 'arrived' })
   },
   replay: () => set({ phase: 'cockpit' }),
+  forceArrive: () => set({ phase: 'arrived' }),
 }))

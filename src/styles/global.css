@@ -46,3 +46,30 @@ a {
   inset: 0;
   z-index: 0;
 }
+
+/* static starfield when WebGL is unavailable */
+.space-fallback {
+  position: fixed;
+  inset: 0;
+  z-index: 0;
+  background:
+    radial-gradient(1px 1px at 12% 18%, #dfe7f5 50%, transparent 51%),
+    radial-gradient(1px 1px at 72% 34%, #a9c8ff 50%, transparent 51%),
+    radial-gradient(1.5px 1.5px at 38% 72%, #ffe2bf 50%, transparent 51%),
+    radial-gradient(1px 1px at 86% 82%, #dfe7f5 50%, transparent 51%),
+    radial-gradient(1px 1px at 55% 12%, #dfe7f5 50%, transparent 51%),
+    radial-gradient(1px 1px at 24% 52%, #a9c8ff 50%, transparent 51%),
+    radial-gradient(ellipse at 30% 30%, rgb(29 59 138 / 0.25), transparent 60%),
+    radial-gradient(ellipse at 75% 70%, rgb(15 90 110 / 0.2), transparent 55%),
+    var(--bg);
+  background-size:
+    220px 220px,
+    310px 310px,
+    270px 270px,
+    190px 190px,
+    350px 350px,
+    240px 240px,
+    100% 100%,
+    100% 100%,
+    100% 100%;
+}

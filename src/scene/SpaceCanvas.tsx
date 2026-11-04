@@ -1,5 +1,6 @@
 import { Canvas } from '@react-three/fiber'
 import { JUMP } from '../intro/timeline'
+import { AdaptiveDpr } from './AdaptiveDpr'
 import { CameraRig } from './CameraRig'
 import { Galaxies } from './galaxy/Galaxies'
 import { JumpDriver } from './JumpDriver'
@@ -17,6 +18,7 @@ export function SpaceCanvas() {
         camera={{ fov: JUMP.fov.rest, near: 0.1, far: 4000, position: [0, 0, 0] }}
       >
         <color attach="background" args={['#03050b']} />
+        <AdaptiveDpr />
         <JumpDriver />
         <CameraRig />
         <Nebula />

@@ -7,6 +7,7 @@ import { SpaceCanvas } from './scene/SpaceCanvas'
 import { useGalaxy } from './state/galaxyStore'
 import { useIntro } from './state/introStore'
 import { HomeHud } from './ui/HomeHud'
+import { SceneBoundary } from './ui/SceneBoundary'
 import { SectionPage } from './ui/SectionPage'
 import './ui/ui.css'
 
@@ -16,6 +17,7 @@ export default function App() {
   const active = clusterForPath(pathname)
   const docked = useGalaxy((s) => s.docked)
   const setActive = useGalaxy((s) => s.setActive)
+  const sceneAvailable = useGalaxy((s) => s.sceneAvailable)
 
   useEffect(() => {
     setActive(active?.id ?? null)
@@ -25,7 +27,13 @@ export default function App() {
 
   return (
     <>
-      <SpaceCanvas />
+      {sceneAvailable ? (
+        <SceneBoundary>
+          <SpaceCanvas />
+        </SceneBoundary>
+      ) : (
+        <div className="space-fallback" aria-hidden="true" />
+      )}
       {phase !== 'arrived' && <IntroLayer />}
       {phase === 'arrived' && <HomeHud visible={!active} />}
       <AnimatePresence>
