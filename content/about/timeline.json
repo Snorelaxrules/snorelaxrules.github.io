@@ -1,0 +1,35 @@
+{
+  "$comment": "About → Flight Path. Shown in order, left to right. photo is a path under /public (e.g. /images/flight/robotics.jpg) or empty; missing photos get a generated placeholder. date is free text.",
+  "waypoints": [
+    {
+      "title": "[Placeholder: Launch]",
+      "date": "[Placeholder: year]",
+      "photo": "",
+      "text": "[Placeholder: where it all started — a sentence or two about early beginnings in Cupertino.]"
+    },
+    {
+      "title": "[Placeholder: First build]",
+      "date": "[Placeholder: year]",
+      "photo": "",
+      "text": "[Placeholder: the first thing you made that worked, and what it taught you.]"
+    },
+    {
+      "title": "[Placeholder: High school milestone]",
+      "date": "[Placeholder: year]",
+      "photo": "",
+      "text": "[Placeholder: a team, a competition, a project, or a turning point.]"
+    },
+    {
+      "title": "[Placeholder: Arrival at Cornell]",
+      "date": "[Placeholder: Fall 2025]",
+      "photo": "",
+      "text": "[Placeholder: landing in Ithaca, first impressions, what you came to do.]"
+    },
+    {
+      "title": "[Placeholder: Now]",
+      "date": "[Placeholder: present]",
+      "photo": "",
+      "text": "[Placeholder: what you're building, studying, or chasing at the moment.]"
+    }
+  ]
+}

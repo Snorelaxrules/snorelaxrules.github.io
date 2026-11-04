@@ -1,5 +1,5 @@
 import { type ComponentType, lazy } from 'react'
-import About from './About'
+import About from './about/About'
 import ComingSoon from './ComingSoon'
 import Contact from './Contact'
 import Lab from './Lab'
@@ -20,6 +20,6 @@ const sections: Record<string, ComponentType<SectionProps>> = {
 }
 
 /** Sections that use the wide page layout. */
-export const WIDE_SECTIONS = new Set(['map', 'lab'])
+export const WIDE_SECTIONS = new Set(['about', 'map', 'lab'])
 
 export const sectionFor = (id: string) => sections[id] ?? ComingSoon

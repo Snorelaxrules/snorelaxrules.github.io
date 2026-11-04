@@ -23,6 +23,12 @@ export default function App() {
     setActive(active?.id ?? null)
   }, [active, setActive])
 
+  // opening a section (e.g. editing the URL) while the cockpit is up skips the intro
+  const skipIntro = useIntro((s) => s.skip)
+  useEffect(() => {
+    if (active && phase === 'cockpit') skipIntro()
+  }, [active, phase, skipIntro])
+
   // Esc leaves a section from the moment it's chosen, including mid-flight
   const navigate = useNavigate()
   const inSection = active !== null

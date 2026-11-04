@@ -6,10 +6,12 @@ import { goTo, useGalaxy } from '../../state/galaxyStore'
 import { useIntro } from '../../state/introStore'
 import { flight } from '../flight'
 import { damp, prefersReducedMotion } from '../pointer'
-import { SHIP } from './shipConfig'
+import { SHIP, rangeOf } from './shipConfig'
+import { BlackHole } from './BlackHole'
+import { blackHole } from './blackHoleState'
 import { ShipModel } from './ShipModel'
 import { ShipTrail } from './ShipTrail'
-import { type Direction, keys, pan, rangeOf, ship } from './shipState'
+import { type Direction, keys, pan, ship } from './shipState'
 
 const KEYMAP: Record<string, Direction> = {
   KeyW: 'up',
@@ -30,6 +32,105 @@ const isTyping = (t: EventTarget | null) =>
 
 /** Keys only steer the ship on the galaxy view, never while a page is open or during the intro. */
 const canFly = () => useIntro.getState().phase === 'arrived' && useGalaxy.getState().activeId === null
+
+const SUBSTEP = 1 / 240
+const smoothstep = (e0: number, e1: number, x: number) => {
+  const u = Math.min(1, Math.max(0, (x - e0) / (e1 - e0)))
+  return u * u * (3 - 2 * u)
+}
+
+/**
+ * Thrust, black-hole gravity, drag, and soft bounds, integrated in fixed
+ * sub-steps (semi-implicit Euler) so tight passes near the hole stay stable at
+ * any frame rate. Returns the final speed.
+ */
+function integrate(dt: number, ix: number, iy: number, flying: boolean) {
+  const { pos, vel } = ship
+  const BH = SHIP.blackHole
+  const b = SHIP.bounds
+  const eps2 = BH.softening * BH.softening
+  const steps = Math.max(1, Math.ceil(dt / SUBSTEP))
+  const h = dt / steps
+  let speed = Math.hypot(vel.x, vel.y)
+
+  for (let i = 0; i < steps; i++) {
+    // thrust only adds speed up to maxSpeed in the direction you're pushing,
+    // so gravity can take you faster than the engines can
+    if (ix || iy) {
+      const along = vel.x * ix + vel.y * iy
+      if (along < SHIP.maxSpeed) {
+        vel.x += ix * SHIP.accel * h
+        vel.y += iy * SHIP.accel * h
+      }
+    }
+
+    // gravity: a = mu * r / (r² + ε²)^1.5, faded out toward the edge of influence
+    let well = 0
+    if (flying && blackHole.active) {
+      const dx = blackHole.x - pos.x
+      const dy = blackHole.y - pos.y
+      const r2 = dx * dx + dy * dy
+      const r = Math.sqrt(r2)
+      if (r < BH.horizon) {
+        swallow()
+        return 0
+      }
+      const fade = 1 - smoothstep(BH.influence * 0.6, BH.influence, r)
+      if (fade > 0) {
+        const a = (BH.mu / (r2 + eps2) ** 1.5) * fade
+        vel.x += dx * a * h
+        vel.y += dy * a * h
+      }
+      well = 1 - smoothstep(BH.softening * 2, BH.influence * 0.7, r)
+    }
+
+    // drag, weaker deep in the well so slingshots carry their speed
+    const decay = Math.exp(-SHIP.drag * (1 + (BH.wellDrag - 1) * well) * h)
+    vel.x *= decay
+    vel.y *= decay
+
+    // above cruising speed, the excess bleeds off once you're clear of the well
+    speed = Math.hypot(vel.x, vel.y)
+    if (speed > SHIP.maxSpeed) {
+      let target = SHIP.maxSpeed + (speed - SHIP.maxSpeed) * Math.exp(-BH.overspeedBleed * (1 - well) * h)
+      target = Math.min(target, BH.speedLimit)
+      vel.x *= target / speed
+      vel.y *= target / speed
+      speed = target
+    }
+
+    // soft world bounds
+    const k = SHIP.boundaryStiffness * h
+    if (pos.x > b.x) vel.x -= (pos.x - b.x) * k
+    if (pos.x < -b.x) vel.x -= (pos.x + b.x) * k
+    if (pos.y > b.yMax) vel.y -= (pos.y - b.yMax) * k
+    if (pos.y < b.yMin) vel.y -= (pos.y - b.yMin) * k
+
+    pos.x += vel.x * h
+    pos.y += vel.y * h
+  }
+  return speed
+}
+
+function swallow() {
+  const len = Math.hypot(ship.vel.x, ship.vel.y)
+  const a = Math.random() * Math.PI * 2
+  ship.entryX = len > 1e-3 ? ship.vel.x / len : Math.cos(a)
+  ship.entryY = len > 1e-3 ? ship.vel.y / len : Math.sin(a)
+  ship.swallowed = 0
+  ship.spin = 0
+  ship.vel.set(0, 0, 0)
+}
+
+function eject() {
+  const BH = SHIP.blackHole
+  ship.pos.x = blackHole.x + ship.entryX * BH.ejectDistance
+  ship.pos.y = blackHole.y + ship.entryY * BH.ejectDistance
+  ship.vel.set(ship.entryX * BH.ejectSpeed, ship.entryY * BH.ejectSpeed, 0)
+  ship.heading = Math.atan2(ship.entryY, ship.entryX)
+  ship.swallowed = -1
+  ship.spin = 0
+}
 
 /**
  * The player ship: keyboard input, framerate-independent physics, banking,
@@ -83,12 +184,13 @@ export function Ship() {
     const dt = Math.min(delta, 0.05)
     const reduced = prefersReducedMotion()
     const flying = canFly()
+    const swallowed = ship.swallowed >= 0
     const galaxy = useGalaxy.getState()
 
     // --- input ---------------------------------------------------------------
     let ix = 0
     let iy = 0
-    if (flying) {
+    if (flying && !swallowed) {
       if (keys.has('left')) ix -= 1
       if (keys.has('right')) ix += 1
       if (keys.has('up')) iy += 1
@@ -105,26 +207,19 @@ export function Ship() {
 
     // --- physics -------------------------------------------------------------
     const { pos, vel } = ship
-    vel.x += ix * SHIP.accel * dt
-    vel.y += iy * SHIP.accel * dt
-    const decay = Math.exp(-SHIP.drag * dt)
-    vel.x *= decay
-    vel.y *= decay
-
-    const b = SHIP.bounds
-    const k = SHIP.boundaryStiffness * dt
-    if (pos.x > b.x) vel.x -= (pos.x - b.x) * k
-    if (pos.x < -b.x) vel.x -= (pos.x + b.x) * k
-    if (pos.y > b.yMax) vel.y -= (pos.y - b.yMax) * k
-    if (pos.y < b.yMin) vel.y -= (pos.y - b.yMin) * k
-
-    const speed = Math.hypot(vel.x, vel.y)
-    if (speed > SHIP.maxSpeed) {
-      vel.x *= SHIP.maxSpeed / speed
-      vel.y *= SHIP.maxSpeed / speed
+    let speed = 0
+    if (swallowed) {
+      // inside: drawn to the singularity, spinning, then spat out along the way we came in
+      const BH = SHIP.blackHole
+      ship.swallowed += dt
+      const k = 1 - Math.exp(-10 * dt)
+      pos.x += (blackHole.x - pos.x) * k
+      pos.y += (blackHole.y - pos.y) * k
+      ship.spin += dt * (6 + 24 * Math.min(1, ship.swallowed / BH.swallowTime))
+      if (ship.swallowed >= BH.swallowTime) eject()
+    } else {
+      speed = integrate(dt, ix, iy, flying)
     }
-    pos.x += vel.x * dt
-    pos.y += vel.y * dt
     pos.z = SHIP.spawn.z + (reduced ? 0 : Math.sin(clock.elapsedTime * 1.3) * 0.25)
 
     // nose follows the direction of travel; bank into turns
@@ -145,15 +240,16 @@ export function Ship() {
     }
 
     body.position.copy(pos)
-    body.rotation.set(0, 0, ship.heading)
+    body.rotation.set(0, 0, ship.heading + ship.spin)
     bank.rotation.x = ship.bank
     const reveal = Math.min(1, flight.reveal)
     body.visible = reveal > 0.02
-    body.scale.setScalar(SHIP.scale * reveal)
+    const squeeze = swallowed ? Math.max(0, 1 - ship.swallowed / (SHIP.blackHole.swallowTime * 0.6)) : 1
+    body.scale.setScalar(SHIP.scale * reveal * squeeze)
 
     // --- proximity: nearest cluster in range (screen-plane distance) ----------
     let nearest: string | null = null
-    if (flying) {
+    if (flying && !swallowed) {
       let best = Infinity
       for (const c of clusters) {
         const d = Math.hypot(c.position[0] - pos.x, c.position[1] - pos.y)
@@ -191,6 +287,7 @@ export function Ship() {
         </group>
       </group>
       <ShipTrail />
+      {blackHole.active && <BlackHole />}
     </>
   )
 }

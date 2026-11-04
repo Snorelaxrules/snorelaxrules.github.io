@@ -1,0 +1,12 @@
+{
+  "$comment": "About → Constellation. One interest per star of Ursa Minor. star must be one of: polaris, yildun, epsilon, zeta, eta, pherkad, kochab. Polaris is the anchor (core interest). photo is optional.",
+  "interests": [
+    { "star": "polaris", "title": "[Placeholder: core interest]", "text": "[Placeholder: the thing everything else orbits around. Why it matters to you.]", "photo": "" },
+    { "star": "yildun", "title": "[Placeholder: interest]", "text": "[Placeholder: a sentence or two about this interest.]", "photo": "" },
+    { "star": "epsilon", "title": "[Placeholder: interest]", "text": "[Placeholder: a sentence or two about this interest.]", "photo": "" },
+    { "star": "zeta", "title": "[Placeholder: interest]", "text": "[Placeholder: a sentence or two about this interest.]", "photo": "" },
+    { "star": "eta", "title": "[Placeholder: interest]", "text": "[Placeholder: a sentence or two about this interest.]", "photo": "" },
+    { "star": "pherkad", "title": "[Placeholder: interest]", "text": "[Placeholder: a sentence or two about this interest.]", "photo": "" },
+    { "star": "kochab", "title": "[Placeholder: interest]", "text": "[Placeholder: a sentence or two about this interest.]", "photo": "" }
+  ]
+}

@@ -90,7 +90,7 @@ export function ShipTrail() {
     }
 
     // emit from the engine, faster when thrusting
-    if (flight.reveal > 0.5) {
+    if (flight.reveal > 0.5 && ship.swallowed < 0) {
       s.carry += (SHIP.trail.rateIdle + ship.throttle * SHIP.trail.rateThrust) * scale * dt
       const fx = Math.cos(ship.heading)
       const fy = Math.sin(ship.heading)

@@ -32,7 +32,10 @@ All text lives in `/content`. Edit it, commit, push. No component changes needed
 | File | What it controls |
 | --- | --- |
 | `content/site.json` | Name and tagline |
-| `content/about.md` | Bio (markdown body) plus `role`, `location`, `photo`, `resume` frontmatter |
+| `content/about/dossier.json` | About → Dossier: ID-card fields, photo, résumé, redacted lines, motto |
+| `content/about/timeline.json` | About → Flight Path waypoints |
+| `content/about/interests.json` | About → Constellation: one interest per star |
+| `content/about/log/*.md` | About → Ship's Log entries |
 | `content/writing/*.md` | Blog posts |
 | `content/places.json` | Places on the map |
 | `content/projects.json` | Lab cards |
@@ -58,6 +61,41 @@ Markdown body…
 
 The filename becomes the URL: `/#/writing/my-post`. Posts sort newest-first by `date`.
 Frontmatter supports simple `key: value` pairs and `key: [a, b]` lists.
+
+### About page
+
+The About page has four tabs, each with its own URL: `/#/about`,
+`/#/about/flight-path`, `/#/about/constellation`, `/#/about/log`.
+Photos are optional everywhere. Use a path under `/public` (e.g.
+`/images/flight/robotics.jpg`); an empty or missing photo shows a generated
+placeholder.
+
+**Add a timeline waypoint:** append to `waypoints` in `content/about/timeline.json`.
+Waypoints show in array order, and the tracker adapts to any count.
+
+```json
+{ "title": "First hackathon", "date": "Spring 2024", "photo": "/images/flight/hackathon.jpg", "text": "Two sentences about it." }
+```
+
+**Change an interest:** edit the entry for that star in `content/about/interests.json`.
+The constellation is real, so there are exactly seven stars: `polaris` (the anchor,
+drawn brightest), `yildun`, `epsilon`, `zeta`, `eta`, `pherkad`, and `kochab`.
+
+```json
+{ "star": "kochab", "title": "Photography", "text": "Why I love it.", "photo": "" }
+```
+
+**Add a log entry:** add a markdown file to `content/about/log/`. The list sorts
+newest-first and shows a stardate (year plus day of year) beside each date.
+
+```md
+---
+title: Engines online
+date: 2026-11-04
+---
+
+Markdown body…
+```
 
 ### Add a place
 
@@ -103,6 +141,7 @@ Append to `content/places.json`:
 - **Camera (home view, flight times, drift, parallax):** `src/scene/rig.ts`.
 - **Colours and fonts:** `src/styles/tokens.css`.
 - **The ship:** `src/scene/ship/shipConfig.ts` holds speed, acceleration, drag, banking, bounds, proximity radius, camera follow and lag, trail, and drag-to-pan limits, and hint timing. The look is in `ShipModel.tsx`; replace its contents to use a model or sprite, keeping the nose along +x and the engine at `ENGINE_OFFSET`.
+- **Black hole:** `SHIP.blackHole` in the same file holds the gravity strength (`mu`), softening, influence radius, event horizon, how long the ship stays swallowed, and how hard it's spat out. It lands somewhere random on each visit; add `?bh=x,y` to the URL to pin it while tuning (e.g. `/?bh=11,-25` puts it right next to the spawn point).
 - **Cockpit art:** `src/intro/cockpit.config.ts`. Set `frameImage` to a 16:9 PNG with transparent windows to replace the SVG frame. The instruments and lever share the same 1600×900 coordinate space, so they stay aligned.
 
 ## How it fits together

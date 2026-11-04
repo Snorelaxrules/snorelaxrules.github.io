@@ -1,0 +1,921 @@
+/* =========================================================================
+   About: four "ship systems" sharing one language: thin cyan hairlines,
+   display-font labels in spaced caps, amber for emphasis, faint scanlines.
+   ========================================================================= */
+
+.about .section-header {
+  margin-bottom: 28px;
+}
+
+.hairline-panel,
+.dossier,
+.console,
+.star-card,
+.fp-viewport {
+  border: 1px solid var(--line);
+  border-radius: 16px;
+  background: linear-gradient(160deg, rgb(122 224 255 / 0.05), rgb(6 10 20 / 0.55) 45%);
+}
+
+.label-caps,
+.dossier-head,
+.dossier-fields dt,
+.dossier-now dt,
+.dossier-label,
+.fp-date,
+.fp-dot-label,
+.fp-hint,
+.star-card-name,
+.star-hint,
+.console-bar,
+.console-meta {
+  font: 500 11px var(--font-display);
+  letter-spacing: 0.22em;
+  text-transform: uppercase;
+}
+
+/* --- tab bar --------------------------------------------------------------- */
+
+.systems {
+  display: flex;
+  gap: 4px;
+  margin-bottom: 32px;
+  border-bottom: 1px solid var(--line);
+  overflow-x: auto;
+  scrollbar-width: none;
+}
+
+.system-tab {
+  position: relative;
+  display: inline-flex;
+  align-items: baseline;
+  gap: 8px;
+  padding: 12px 16px 14px;
+  border: 0;
+  background: none;
+  color: var(--fg-muted);
+  font: 600 12px var(--font-display);
+  letter-spacing: 0.18em;
+  text-transform: uppercase;
+  white-space: nowrap;
+  cursor: pointer;
+  transition: color 0.2s;
+}
+
+.system-tab:hover,
+.system-tab[aria-selected='true'] {
+  color: var(--fg);
+}
+
+.system-index {
+  font-size: 10px;
+  color: var(--accent-warm);
+  opacity: 0.8;
+}
+
+.system-underline {
+  position: absolute;
+  left: 12px;
+  right: 12px;
+  bottom: -1px;
+  height: 2px;
+  border-radius: 2px;
+  background: var(--accent);
+  box-shadow: 0 0 12px rgb(122 224 255 / 0.7);
+}
+
+.system-panel {
+  min-height: 420px;
+}
+
+/* --- photo / placeholder ---------------------------------------------------- */
+
+.photo {
+  display: block;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
+.photo-placeholder {
+  display: grid;
+  place-items: end start;
+  padding: 12px;
+  background:
+    radial-gradient(1.5px 1.5px at 18% 24%, #fff 50%, transparent 51%),
+    radial-gradient(1px 1px at 72% 18%, #cfe0ff 50%, transparent 51%),
+    radial-gradient(1px 1px at 61% 57%, #fff 50%, transparent 51%),
+    radial-gradient(1px 1px at 33% 71%, #cfe0ff 50%, transparent 51%),
+    radial-gradient(1.5px 1.5px at 86% 78%, #fff 50%, transparent 51%),
+    radial-gradient(1px 1px at 46% 38%, #fff 50%, transparent 51%),
+    radial-gradient(circle at var(--ph-x) 35%, hsl(var(--ph-a) 70% 45% / 0.55), transparent 55%),
+    radial-gradient(circle at 80% 90%, hsl(var(--ph-b) 70% 40% / 0.45), transparent 50%),
+    #070c1a;
+}
+
+.photo-placeholder span {
+  font: 500 10px var(--font-display);
+  letter-spacing: 0.22em;
+  text-transform: uppercase;
+  color: rgb(223 231 245 / 0.55);
+}
+
+/* --- 1. Dossier ---------------------------------------------------------------- */
+
+.dossier {
+  position: relative;
+  overflow: hidden;
+}
+
+/* faint scanlines over the whole card */
+.dossier::after {
+  content: '';
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+  background: repeating-linear-gradient(0deg, rgb(122 224 255 / 0.025) 0 1px, transparent 1px 4px);
+}
+
+.dossier-head {
+  display: flex;
+  align-items: center;
+  gap: 16px;
+  padding: 12px 24px;
+  border-bottom: 1px solid var(--line);
+  color: var(--fg-muted);
+  background: rgb(122 224 255 / 0.04);
+}
+
+.dossier-id {
+  color: var(--accent);
+}
+
+.clearance {
+  margin-left: auto;
+  padding: 3px 10px;
+  border: 1px solid rgb(255 179 107 / 0.45);
+  border-radius: 4px;
+  color: var(--accent-warm);
+}
+
+.dossier-body {
+  display: grid;
+  grid-template-columns: 200px 1fr;
+  gap: 36px;
+  padding: 28px 28px 32px;
+}
+
+@media (max-width: 760px) {
+  .dossier-body {
+    grid-template-columns: 1fr;
+  }
+}
+
+.dossier-ident {
+  display: grid;
+  gap: 12px;
+  align-content: start;
+}
+
+.dossier-photo {
+  position: relative;
+  aspect-ratio: 4 / 5;
+  overflow: hidden;
+  border: 1px solid var(--line);
+  border-radius: 10px;
+}
+
+/* holographic sheen drifting across the photo */
+.dossier-photo::after {
+  content: '';
+  position: absolute;
+  inset: -50%;
+  pointer-events: none;
+  background: linear-gradient(
+    115deg,
+    transparent 40%,
+    rgb(122 224 255 / 0.12) 48%,
+    rgb(255 179 107 / 0.08) 52%,
+    transparent 60%
+  );
+  animation: holo 7s ease-in-out infinite;
+}
+
+@keyframes holo {
+  0%,
+  100% {
+    transform: translateX(-30%);
+  }
+  50% {
+    transform: translateX(30%);
+  }
+}
+
+.barcode {
+  width: 100%;
+  height: 26px;
+  fill: var(--fg);
+  opacity: 0.55;
+}
+
+.dossier-code {
+  margin: -6px 0 0;
+  font: 500 10px var(--font-mono);
+  letter-spacing: 0.3em;
+  color: var(--fg-muted);
+}
+
+.dossier-name {
+  margin: 0 0 20px;
+  font-size: 2rem;
+}
+
+.dossier-fields,
+.dossier-now {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+  gap: 16px 28px;
+  margin: 0;
+}
+
+.dossier-fields dt,
+.dossier-now dt {
+  color: var(--fg-muted);
+}
+
+.dossier-fields dd,
+.dossier-now dd {
+  margin: 4px 0 0;
+}
+
+.dossier-now {
+  margin-top: 22px;
+  padding-top: 18px;
+  border-top: 1px dashed var(--line);
+}
+
+.dossier-now dt::before {
+  content: '▸ ';
+  color: var(--accent-warm);
+}
+
+.dossier-redacted {
+  margin-top: 22px;
+}
+
+.dossier-label {
+  margin: 0 0 10px;
+  color: var(--fg-muted);
+}
+
+.dossier-redacted ul {
+  display: grid;
+  gap: 8px;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.redacted {
+  padding: 1px 4px;
+  border-radius: 2px;
+  background: #000;
+  color: transparent;
+  box-shadow: inset 0 0 0 1px rgb(255 255 255 / 0.04);
+  cursor: help;
+  outline: none;
+  transition:
+    background 0.35s,
+    color 0.35s;
+  user-select: none;
+}
+
+.redacted:hover,
+.redacted:focus-visible {
+  background: rgb(255 179 107 / 0.12);
+  color: var(--fg);
+  user-select: text;
+}
+
+.dossier-motto {
+  margin: 24px 0;
+  padding-left: 14px;
+  border-left: 2px solid var(--accent-warm);
+  color: var(--fg-muted);
+  font-style: italic;
+}
+
+.dossier-actions {
+  display: flex;
+  gap: 12px;
+}
+
+/* --- 2. Flight Path ------------------------------------------------------------ */
+
+.fp-stage {
+  display: grid;
+  grid-template-columns: auto 1fr auto;
+  align-items: center;
+  gap: 16px;
+}
+
+.fp-nav {
+  display: grid;
+  place-items: center;
+  width: 44px;
+  height: 44px;
+  border: 1px solid var(--line);
+  border-radius: 50%;
+  background: rgb(4 6 13 / 0.6);
+  color: var(--accent);
+  font-size: 18px;
+  cursor: pointer;
+  transition:
+    border-color 0.2s,
+    opacity 0.2s;
+}
+
+.fp-nav:hover:not(:disabled) {
+  border-color: var(--accent);
+}
+
+.fp-nav:disabled {
+  opacity: 0.3;
+  cursor: default;
+}
+
+.fp-viewport {
+  overflow: hidden;
+}
+
+.fp-track {
+  display: flex;
+}
+
+.fp-slide {
+  flex: 0 0 100%;
+  display: grid;
+  grid-template-columns: 1.1fr 1fr;
+  gap: 28px;
+  padding: 24px;
+  min-width: 0;
+}
+
+@media (max-width: 760px) {
+  .fp-slide {
+    grid-template-columns: 1fr;
+  }
+}
+
+.fp-photo {
+  aspect-ratio: 16 / 10;
+  border: 1px solid var(--line);
+  border-radius: 10px;
+}
+
+.fp-copy {
+  align-self: center;
+}
+
+.fp-date {
+  margin: 0 0 8px;
+  color: var(--accent-warm);
+}
+
+.fp-date span {
+  color: var(--fg-muted);
+}
+
+.fp-copy h2 {
+  margin: 0 0 12px;
+  font-size: 1.6rem;
+}
+
+.fp-copy p:last-child {
+  margin: 0;
+  color: var(--fg-muted);
+}
+
+.fp-tracker {
+  margin: 36px 64px 0;
+}
+
+.fp-rail {
+  position: relative;
+  height: 56px;
+}
+
+.fp-line,
+.fp-progress {
+  position: absolute;
+  top: 18px;
+  left: 0;
+  height: 2px;
+  border-radius: 2px;
+}
+
+.fp-line {
+  right: 0;
+  background: repeating-linear-gradient(90deg, rgb(122 224 255 / 0.25) 0 6px, transparent 6px 12px);
+}
+
+/* the trail: completed path, brightening toward the ship */
+.fp-progress {
+  background: linear-gradient(90deg, rgb(122 224 255 / 0.15), rgb(122 224 255 / 0.85));
+  box-shadow: 0 0 10px rgb(122 224 255 / 0.4);
+  transition: width 0.7s cubic-bezier(0.65, 0, 0.35, 1);
+}
+
+.fp-dot {
+  position: absolute;
+  top: 19px;
+  width: 22px;
+  height: 22px;
+  padding: 0;
+  border: 0;
+  background: none;
+  transform: translate(-50%, -50%);
+  cursor: pointer;
+}
+
+.fp-dot::before {
+  content: '';
+  position: absolute;
+  inset: 6px;
+  border: 1px solid rgb(122 224 255 / 0.35);
+  border-radius: 50%;
+  background: var(--bg);
+  transition:
+    background 0.3s,
+    box-shadow 0.3s,
+    border-color 0.3s;
+}
+
+.fp-dot.is-lit::before {
+  border-color: var(--accent);
+  background: var(--accent);
+  box-shadow: 0 0 10px rgb(122 224 255 / 0.8);
+}
+
+.fp-dot:hover::before {
+  border-color: var(--accent);
+}
+
+.fp-dot-label {
+  position: absolute;
+  top: 26px;
+  left: 50%;
+  transform: translateX(-50%);
+  white-space: nowrap;
+  font-size: 10px;
+  color: var(--fg-muted);
+  opacity: 0.55;
+  transition: opacity 0.2s;
+}
+
+.fp-dot.is-current .fp-dot-label,
+.fp-dot:hover .fp-dot-label {
+  opacity: 1;
+  color: var(--fg);
+}
+
+.fp-ship {
+  position: absolute;
+  top: 0;
+  transform: translate(-50%, -2px);
+  transition: left 0.7s cubic-bezier(0.65, 0, 0.35, 1);
+  pointer-events: none;
+}
+
+.fp-ship svg {
+  display: block;
+  filter: drop-shadow(0 0 6px rgb(122 224 255 / 0.5));
+  transition: transform 0.3s;
+}
+
+.fp-ship[data-heading='-1'] svg {
+  transform: scaleX(-1);
+}
+
+/* short exhaust plume behind the ship */
+.fp-ship-trail {
+  position: absolute;
+  top: 8px;
+  right: 22px;
+  width: 46px;
+  height: 3px;
+  border-radius: 3px;
+  background: linear-gradient(90deg, transparent, rgb(255 179 107 / 0.7));
+  filter: blur(1px);
+}
+
+.fp-ship[data-heading='-1'] .fp-ship-trail {
+  right: auto;
+  left: 22px;
+  background: linear-gradient(270deg, transparent, rgb(255 179 107 / 0.7));
+}
+
+.fp-ship-engine {
+  animation: engine 0.6s ease-in-out infinite alternate;
+}
+
+@keyframes engine {
+  to {
+    opacity: 0.55;
+  }
+}
+
+.fp-hint {
+  margin: 8px 0 0;
+  text-align: center;
+  color: var(--fg-muted);
+}
+
+.about kbd {
+  display: inline-grid;
+  place-items: center;
+  min-width: 22px;
+  height: 20px;
+  padding: 0 5px;
+  border: 1px solid var(--line);
+  border-bottom-width: 2px;
+  border-radius: 5px;
+  color: var(--accent);
+  font: 600 11px var(--font-display);
+}
+
+/* --- 3. Constellation ------------------------------------------------------------ */
+
+.constellation {
+  display: grid;
+  grid-template-columns: minmax(0, 1.35fr) minmax(260px, 1fr);
+  gap: 32px;
+  align-items: start;
+}
+
+@media (max-width: 820px) {
+  .constellation {
+    grid-template-columns: 1fr;
+  }
+}
+
+.star-map {
+  border: 1px solid var(--line);
+  border-radius: 16px;
+  background: radial-gradient(ellipse at 30% 25%, rgb(29 59 138 / 0.25), transparent 60%), rgb(3 6 14 / 0.6);
+  overflow: hidden;
+}
+
+.star-map svg {
+  display: block;
+  width: 100%;
+  height: auto;
+  max-height: 520px;
+}
+
+.sky-grid circle {
+  fill: none;
+  stroke: var(--accent);
+  stroke-opacity: 0.07;
+  stroke-width: 0.04;
+  stroke-dasharray: 0.25 0.25;
+}
+
+.star-lines line {
+  stroke: var(--accent);
+  stroke-opacity: 0.28;
+  stroke-width: 0.06;
+  transition:
+    stroke-opacity 0.25s,
+    stroke-width 0.25s;
+}
+
+.star-lines line.is-lit {
+  stroke-opacity: 0.85;
+  stroke-width: 0.09;
+}
+
+.star {
+  cursor: pointer;
+  outline: none;
+}
+
+.star-core {
+  fill: #fdfbff;
+  transition: filter 0.25s;
+}
+
+.star-glow {
+  transform-box: fill-box;
+  transform-origin: center;
+  opacity: 0.75;
+  animation: twinkle 3.6s ease-in-out infinite;
+  transition: opacity 0.25s;
+}
+
+.star.is-anchor .star-glow {
+  opacity: 1;
+  animation-duration: 5s;
+}
+
+.star.is-focus .star-glow {
+  opacity: 1;
+  animation-play-state: paused;
+  transform: scale(1.35);
+}
+
+.star-ring {
+  fill: none;
+  stroke: var(--accent-warm);
+  stroke-width: 0.05;
+  opacity: 0;
+  transition: opacity 0.25s;
+}
+
+.star.is-selected .star-ring {
+  opacity: 0.9;
+}
+
+.star:focus-visible .star-ring {
+  opacity: 1;
+  stroke: var(--accent);
+}
+
+.star-label {
+  font: 500 0.42px var(--font-display);
+  letter-spacing: 0.08px;
+  fill: var(--fg-muted);
+  opacity: 0.5;
+  transition: opacity 0.25s;
+  text-transform: uppercase;
+}
+
+.star.is-focus .star-label,
+.star.is-selected .star-label {
+  opacity: 1;
+  fill: var(--fg);
+}
+
+@keyframes twinkle {
+  0%,
+  100% {
+    transform: scale(1);
+    opacity: 0.75;
+  }
+  50% {
+    transform: scale(0.82);
+    opacity: 0.5;
+  }
+}
+
+.star-card-slot {
+  display: grid;
+  gap: 12px;
+}
+
+.star-card {
+  padding: 24px;
+}
+
+.star-card-name {
+  margin: 0 0 8px;
+  color: var(--accent-warm);
+}
+
+.star-card-name span {
+  color: var(--fg-muted);
+  letter-spacing: 0.1em;
+  text-transform: none;
+}
+
+.star-card h2 {
+  margin: 0 0 12px;
+  font-size: 1.5rem;
+}
+
+.star-card p {
+  margin: 0;
+  color: var(--fg-muted);
+}
+
+.star-card-photo {
+  aspect-ratio: 16 / 9;
+  margin-bottom: 14px;
+  border-radius: 10px;
+}
+
+.star-card .star-card-note {
+  margin-top: 14px;
+  font-size: 0.85rem;
+  color: var(--accent);
+}
+
+.star-hint {
+  margin: 0;
+  color: var(--fg-muted);
+  opacity: 0.7;
+}
+
+/* --- 4. Ship's Log --------------------------------------------------------------- */
+
+.console {
+  position: relative;
+  overflow: hidden;
+  font-family: var(--font-mono);
+}
+
+.console::after {
+  content: '';
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+  background: repeating-linear-gradient(0deg, rgb(122 224 255 / 0.03) 0 1px, transparent 1px 3px);
+}
+
+.console-bar {
+  display: flex;
+  align-items: center;
+  gap: 14px;
+  padding: 10px 18px;
+  border-bottom: 1px solid var(--line);
+  background: rgb(122 224 255 / 0.04);
+  color: var(--fg-muted);
+}
+
+.console-lights {
+  display: inline-flex;
+  gap: 6px;
+}
+
+.console-lights i {
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+  background: var(--accent);
+  opacity: 0.6;
+}
+
+.console-lights i:first-child {
+  background: var(--accent-warm);
+}
+
+.console-count {
+  margin-left: auto;
+}
+
+.console-body {
+  display: grid;
+  grid-template-columns: minmax(220px, 300px) 1fr;
+  min-height: 420px;
+}
+
+@media (max-width: 760px) {
+  .console-body {
+    grid-template-columns: 1fr;
+  }
+}
+
+.console-list {
+  margin: 0;
+  padding: 10px;
+  list-style: none;
+  border-right: 1px solid var(--line);
+}
+
+.console-list button {
+  display: grid;
+  gap: 3px;
+  width: 100%;
+  padding: 10px 12px;
+  border: 0;
+  border-radius: 8px;
+  background: none;
+  color: var(--fg-muted);
+  font: inherit;
+  font-size: 13px;
+  text-align: left;
+  cursor: pointer;
+  transition:
+    background 0.2s,
+    color 0.2s;
+}
+
+.console-list button:hover {
+  background: rgb(122 224 255 / 0.05);
+  color: var(--fg);
+}
+
+.console-list button.is-selected {
+  background: rgb(122 224 255 / 0.08);
+  color: var(--fg);
+}
+
+.console-list button.is-selected .console-title::before {
+  content: '▸ ';
+  color: var(--accent-warm);
+}
+
+.console-date {
+  font-size: 11px;
+  color: var(--fg-muted);
+}
+
+.console-date em {
+  font-style: normal;
+  color: var(--accent);
+  opacity: 0.75;
+}
+
+.console-view {
+  padding: 22px 28px 32px;
+  min-width: 0;
+}
+
+.console-meta {
+  margin: 0 0 6px;
+  font-family: var(--font-mono);
+  letter-spacing: 0.12em;
+  color: var(--accent);
+}
+
+.console-heading {
+  margin: 0 0 18px;
+  font: 600 1.25rem var(--font-mono);
+  letter-spacing: 0;
+  color: var(--accent-warm);
+}
+
+.console-entry {
+  font-size: 0.95rem;
+  line-height: 1.75;
+  color: #cfe9f2;
+  cursor: text;
+}
+
+.console-entry[aria-busy='true'] {
+  cursor: pointer;
+}
+
+.console-entry > :first-child {
+  margin-top: 0;
+}
+
+.console-entry h2,
+.console-entry h3 {
+  font: 600 1rem var(--font-mono);
+  color: var(--accent);
+  margin: 1.4em 0 0.4em;
+}
+
+.console-entry h2::before {
+  content: '## ';
+  opacity: 0.5;
+}
+
+.console-entry ul {
+  padding-left: 1.2em;
+}
+
+.console-entry blockquote {
+  margin: 1em 0;
+  padding-left: 1em;
+  border-left: 2px solid var(--accent-warm);
+  color: var(--fg-muted);
+}
+
+.console-entry code {
+  color: var(--accent-warm);
+}
+
+.tw-cursor {
+  display: inline-block;
+  width: 0.55em;
+  height: 1.1em;
+  margin-left: 2px;
+  vertical-align: text-bottom;
+  background: var(--accent);
+  box-shadow: 0 0 8px rgb(122 224 255 / 0.7);
+  animation: blink 1s steps(1) infinite;
+}
+
+@keyframes blink {
+  50% {
+    opacity: 0;
+  }
+}
+
+/* --- reduced motion --------------------------------------------------------------- */
+
+@media (prefers-reduced-motion: reduce) {
+  .dossier-photo::after,
+  .star-glow,
+  .fp-ship-engine,
+  .tw-cursor {
+    animation: none;
+  }
+
+  .fp-progress,
+  .fp-ship {
+    transition: none;
+  }
+}

@@ -1,4 +1,5 @@
 import { Vector3 } from 'three'
+import type { ClusterConfig } from '../../content/clusters'
 
 /**
  * Ship feel. Units are scene units (About's radius is 18) and seconds.
@@ -58,6 +59,36 @@ export const SHIP = {
     reducedScale: 0.3,
   },
 
+  /**
+   * The black hole. Gravity is Plummer-softened Newtonian:
+   *   a = mu * r / (r² + softening²)^1.5   (toward the center)
+   * so it's strong but finite near the core, and it fades to zero by `influence`.
+   * With these numbers the pull beats full thrust inside ~5 units.
+   */
+  blackHole: {
+    mu: 2400,
+    softening: 2.2,
+    influence: 18,
+    /** cross this radius and the ship is swallowed */
+    horizon: 1.4,
+    /** drag multiplier deep in the well (low = slingshots keep their speed) */
+    wellDrag: 0.2,
+    /** how quickly speed above maxSpeed bleeds off once you're out of the well (per second) */
+    overspeedBleed: 1.2,
+    /** absolute speed cap so a slingshot can't fling the ship off the map */
+    speedLimit: 95,
+    /** seconds inside before being spat out the other side */
+    swallowTime: 1.1,
+    ejectSpeed: 42,
+    ejectDistance: 9,
+    /** visual size: shadow (event horizon look) and accretion disk radius */
+    shadowRadius: 2.1,
+    diskRadius: 7.5,
+    /** placement: stay this far outside every cluster's range, and away from the spawn */
+    clusterClearance: 6,
+    spawnClearance: 24,
+  },
+
   hint: {
     /** hide the controls hint after this many seconds of flying */
     hideAfterFlying: 10,
@@ -65,3 +96,6 @@ export const SHIP = {
     showAfterIdle: 6,
   },
 }
+
+/** in-range radius around a cluster */
+export const rangeOf = (c: ClusterConfig) => SHIP.proximity.base + c.size * SHIP.proximity.perSize
