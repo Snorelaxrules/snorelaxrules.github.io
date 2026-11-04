@@ -9,7 +9,7 @@ import { flight } from './flight'
 import { damp, pointer, prefersReducedMotion } from './pointer'
 import { RIG, heading } from './rig'
 import { SHIP } from './ship/shipConfig'
-import { ship } from './ship/shipState'
+import { pan, ship } from './ship/shipState'
 
 interface Pose {
   pos: Vector3
@@ -38,8 +38,16 @@ const copyPose = (out: Pose, p: Pose) => {
 
 /** Home view panned to follow the ship (offset from its spawn point). */
 function followPose(out: Pose) {
-  const dx = (ship.pos.x - SHIP.spawn.x) * SHIP.camera.follow
-  const dy = (ship.pos.y - SHIP.spawn.y) * SHIP.camera.follow
+  const fx = (ship.pos.x - SHIP.spawn.x) * SHIP.camera.follow
+  const fy = (ship.pos.y - SHIP.spawn.y) * SHIP.camera.follow
+  // add the dragged offset, keeping the view center inside the map; write the
+  // clamp back so dragging past the edge doesn't build up a dead zone
+  const { maxX, minY, maxY } = SHIP.camera.pan
+  const homeY = RIG.home.target.y
+  const dx = Math.max(-maxX, Math.min(maxX, fx + pan.x))
+  const dy = Math.max(minY - homeY, Math.min(maxY - homeY, fy + pan.y))
+  pan.x = dx - fx
+  pan.y = dy - fy
   out.pos.set(RIG.home.pos.x + dx, RIG.home.pos.y + dy, RIG.home.pos.z)
   out.target.set(RIG.home.target.x + dx, RIG.home.target.y + dy, RIG.home.target.z)
   out.fov = RIG.home.fov

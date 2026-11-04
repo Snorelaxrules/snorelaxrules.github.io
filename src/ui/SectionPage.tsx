@@ -18,12 +18,7 @@ export function SectionPage({ cluster }: { cluster: ClusterConfig }) {
   useEffect(() => {
     // move focus into the page without flashing a focus ring for pointer users
     backRef.current?.focus({ preventScroll: true, focusVisible: false } as FocusOptions)
-    const onKey = (e: KeyboardEvent) => {
-      if (e.key === 'Escape') navigate('/')
-    }
-    window.addEventListener('keydown', onKey)
-    return () => window.removeEventListener('keydown', onKey)
-  }, [navigate])
+  }, [])
 
   useEffect(() => {
     scrollRef.current?.scrollTo({ top: 0 })

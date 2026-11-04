@@ -1,6 +1,6 @@
 import { AnimatePresence } from 'motion/react'
 import { useEffect } from 'react'
-import { Navigate, useLocation } from 'react-router'
+import { Navigate, useLocation, useNavigate } from 'react-router'
 import { clusterForPath } from './content/clusters'
 import { IntroLayer } from './intro/IntroLayer'
 import { SpaceCanvas } from './scene/SpaceCanvas'
@@ -22,6 +22,18 @@ export default function App() {
   useEffect(() => {
     setActive(active?.id ?? null)
   }, [active, setActive])
+
+  // Esc leaves a section from the moment it's chosen, including mid-flight
+  const navigate = useNavigate()
+  const inSection = active !== null
+  useEffect(() => {
+    if (!inSection) return
+    const onKey = (e: KeyboardEvent) => {
+      if (e.key === 'Escape') navigate('/')
+    }
+    window.addEventListener('keydown', onKey)
+    return () => window.removeEventListener('keydown', onKey)
+  }, [inSection, navigate])
 
   if (!active && pathname !== '/') return <Navigate to="/" replace />
 

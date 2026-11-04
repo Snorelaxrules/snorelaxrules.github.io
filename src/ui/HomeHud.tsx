@@ -15,7 +15,8 @@ export function HomeHud({ visible }: { visible: boolean }) {
 
   // pointer cursor while a cluster in the scene is hovered
   useEffect(() => {
-    document.body.style.cursor = hovered && visible ? 'pointer' : ''
+    // galaxy view: grab cursor signals the background can be dragged
+    document.body.style.cursor = !visible ? '' : hovered ? 'pointer' : 'grab'
     return () => {
       document.body.style.cursor = ''
     }
@@ -60,7 +61,8 @@ export function HomeHud({ visible }: { visible: boolean }) {
             <kbd>S</kbd>
             <kbd>D</kbd>
           </span>
-          to fly <span className="sep">·</span> <kbd>Space</kbd> to enter <span className="sep">·</span> or click a cluster
+          to fly <span className="sep">·</span> <kbd>Space</kbd> to enter <span className="sep">·</span> or click a cluster{' '}
+          <span className="sep">·</span> drag to look around
         </motion.p>
         <ul>
           {clusters.map((c) => (

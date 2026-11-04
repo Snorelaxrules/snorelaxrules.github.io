@@ -36,6 +36,15 @@ export const SHIP = {
     /** follow smoothing (higher = tighter); reduced motion uses the snappier value */
     lag: 2.2,
     lagReduced: 9,
+    /** click-and-drag on empty space pans the view */
+    pan: {
+      /** how fast the view eases back onto the ship once you fly again */
+      recenterRate: 2.5,
+      /** how far the view center may go from About (scene units) */
+      maxX: 56,
+      minY: -26,
+      maxY: 22,
+    },
   },
 
   trail: {

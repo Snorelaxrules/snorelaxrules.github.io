@@ -9,7 +9,7 @@ import { damp, prefersReducedMotion } from '../pointer'
 import { SHIP } from './shipConfig'
 import { ShipModel } from './ShipModel'
 import { ShipTrail } from './ShipTrail'
-import { type Direction, keys, rangeOf, ship } from './shipState'
+import { type Direction, keys, pan, rangeOf, ship } from './shipState'
 
 const KEYMAP: Record<string, Direction> = {
   KeyW: 'up',
@@ -137,6 +137,12 @@ export function Ship() {
     const bankTarget = Math.max(-SHIP.maxBank, Math.min(SHIP.maxBank, -turnRate * SHIP.bankAmount))
     ship.bank = damp(ship.bank, reduced ? bankTarget * 0.4 : bankTarget, 6, dt)
     ship.throttle = damp(ship.throttle, thrusting ? 1 : 0, 5, dt)
+
+    // flying again brings a dragged view back onto the ship
+    if (thrusting && !pan.dragging) {
+      pan.x = damp(pan.x, 0, SHIP.camera.pan.recenterRate, dt)
+      pan.y = damp(pan.y, 0, SHIP.camera.pan.recenterRate, dt)
+    }
 
     body.position.copy(pos)
     body.rotation.set(0, 0, ship.heading)

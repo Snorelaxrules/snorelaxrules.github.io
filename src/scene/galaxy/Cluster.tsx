@@ -115,6 +115,8 @@ export function Cluster({ cfg, interactive }: { cfg: ClusterConfig; interactive:
   }
   const onClick = (e: ThreeEvent<MouseEvent>) => {
     e.stopPropagation()
+    // a drag that started on a cluster pans the view; it isn't a click
+    if (e.delta > 5) return
     goTo(cfg.route)
   }
 

@@ -20,6 +20,9 @@ export const ship = {
   idle: 0,
 }
 
+/** Manual view offset from dragging the background (scene units, added to the ship-follow camera). */
+export const pan = { x: 0, y: 0, dragging: false }
+
 /** Movement keys currently held. */
 export const keys = new Set<Direction>()
 
@@ -55,6 +58,8 @@ useGalaxy.subscribe((s) => {
   const left = clusterById(previous)
   if (left && s.activeId === null) {
     parkNear(left)
+    pan.x = 0
+    pan.y = 0
     ship.flying = 0
     ship.idle = 0
     useGalaxy.getState().setHintVisible(true)

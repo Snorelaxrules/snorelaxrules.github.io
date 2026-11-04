@@ -228,3 +228,15 @@
 .page-main.is-wide {
   max-width: 1080px;
 }
+
+/* --- view panning ---------------------------------------------------------- */
+
+.space-canvas canvas {
+  touch-action: none;
+}
+
+body[data-dragging],
+body[data-dragging] * {
+  cursor: grabbing !important;
+  user-select: none;
+}
