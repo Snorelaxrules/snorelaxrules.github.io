@@ -1,7 +1,7 @@
-import { motion } from 'motion/react'
+import { AnimatePresence, motion } from 'motion/react'
 import { useEffect } from 'react'
 import { Link } from 'react-router'
-import { clusters } from '../content/clusters'
+import { clusterById, clusters } from '../content/clusters'
 import { site } from '../content/site'
 import { goTo, useGalaxy } from '../state/galaxyStore'
 
@@ -9,6 +9,9 @@ import { goTo, useGalaxy } from '../state/galaxyStore'
 export function HomeHud({ visible }: { visible: boolean }) {
   const hovered = useGalaxy((s) => s.hovered)
   const setHovered = useGalaxy((s) => s.setHovered)
+  const proximity = useGalaxy((s) => s.proximity)
+  const hintVisible = useGalaxy((s) => s.hintVisible)
+  const target = clusterById(proximity)
 
   // pointer cursor while a cluster in the scene is hovered
   useEffect(() => {
@@ -30,14 +33,42 @@ export function HomeHud({ visible }: { visible: boolean }) {
         {site.name}
       </Link>
       <nav className="dest-nav" aria-label="Destinations">
-        <span className="dest-nav-hint">Select a destination</span>
+        <div className="hud-prompt-slot" aria-live="polite">
+          <AnimatePresence>
+            {target && visible && (
+              <motion.p
+                key={target.id}
+                className="hud-prompt"
+                initial={{ opacity: 0, y: 6 }}
+                animate={{ opacity: 1, y: 0, transition: { duration: 0.25 } }}
+                exit={{ opacity: 0, transition: { duration: 0.15 } }}
+              >
+                Press <kbd>Space</kbd> to enter <strong>{target.label}</strong>
+              </motion.p>
+            )}
+          </AnimatePresence>
+        </div>
+        <motion.p
+          className="hud-hint"
+          animate={{ opacity: hintVisible && !target ? 1 : 0 }}
+          transition={{ duration: hintVisible ? 0.6 : 1.2 }}
+          aria-hidden={!hintVisible}
+        >
+          <span className="keys">
+            <kbd>W</kbd>
+            <kbd>A</kbd>
+            <kbd>S</kbd>
+            <kbd>D</kbd>
+          </span>
+          to fly <span className="sep">·</span> <kbd>Space</kbd> to enter <span className="sep">·</span> or click a cluster
+        </motion.p>
         <ul>
           {clusters.map((c) => (
             <li key={c.id}>
               <button
                 type="button"
                 tabIndex={visible ? 0 : -1}
-                className={hovered === c.id ? 'is-active' : undefined}
+                className={hovered === c.id || proximity === c.id ? 'is-active' : undefined}
                 onPointerEnter={() => setHovered(c.id)}
                 onPointerLeave={() => setHovered(null)}
                 onFocus={() => setHovered(c.id)}

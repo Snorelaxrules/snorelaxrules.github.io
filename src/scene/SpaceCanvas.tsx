@@ -5,6 +5,7 @@ import { CameraRig } from './CameraRig'
 import { Galaxies } from './galaxy/Galaxies'
 import { JumpDriver } from './JumpDriver'
 import { Nebula } from './Nebula'
+import { Ship } from './ship/Ship'
 import { SkyDome } from './SkyDome'
 import { WarpField } from './WarpField'
 
@@ -24,6 +25,7 @@ export function SpaceCanvas() {
         <Nebula />
         <SkyDome />
         <Galaxies />
+        <Ship />
         <WarpField />
       </Canvas>
     </div>

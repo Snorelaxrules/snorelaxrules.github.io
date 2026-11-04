@@ -64,7 +64,8 @@ export function Cluster({ cfg, interactive }: { cfg: ClusterConfig; interactive:
   const anim = useRef({ hover: 0, reveal: 0 })
   const { geometry, material } = useMemo(() => buildPoints(cfg), [cfg])
   const glowMaterial = useMemo(() => buildGlow(cfg), [cfg])
-  const hovered = useGalaxy((s) => s.hovered === cfg.id)
+  // mouse hover and ship proximity highlight the same way
+  const highlighted = useGalaxy((s) => s.hovered === cfg.id || s.proximity === cfg.id)
   const labelsVisible = useGalaxy((s) => s.activeId === null)
   const setHovered = useGalaxy((s) => s.setHovered)
 
@@ -83,7 +84,8 @@ export function Cluster({ cfg, interactive }: { cfg: ClusterConfig; interactive:
     if (!points || !glow) return
     const a = anim.current
     const dt = Math.min(delta, 0.05)
-    a.hover = damp(a.hover, useGalaxy.getState().hovered === cfg.id ? 1 : 0, 8, dt)
+    const g = useGalaxy.getState()
+    a.hover = damp(a.hover, g.hovered === cfg.id || g.proximity === cfg.id ? 1 : 0, 8, dt)
     a.reveal = damp(a.reveal, flight.reveal, 5, dt)
 
     const u = points.material.uniforms
@@ -132,7 +134,7 @@ export function Cluster({ cfg, interactive }: { cfg: ClusterConfig; interactive:
       )}
       {interactive && (
         <Html position={[0, -cfg.size - 2.5, 0]} center zIndexRange={[5, 0]} style={{ pointerEvents: 'none' }}>
-          <div className={`cluster-label${hovered && labelsVisible ? ' is-visible' : ''}`}>
+          <div className={`cluster-label${highlighted && labelsVisible ? ' is-visible' : ''}`}>
             <span className="cluster-label-name">{cfg.label}</span>
             <span className="cluster-label-sub">{cfg.subtitle}</span>
           </div>

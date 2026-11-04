@@ -8,6 +8,8 @@ import { useIntro } from '../state/introStore'
 import { flight } from './flight'
 import { damp, pointer, prefersReducedMotion } from './pointer'
 import { RIG, heading } from './rig'
+import { SHIP } from './ship/shipConfig'
+import { ship } from './ship/shipState'
 
 interface Pose {
   pos: Vector3
@@ -34,6 +36,16 @@ const copyPose = (out: Pose, p: Pose) => {
   return out
 }
 
+/** Home view panned to follow the ship (offset from its spawn point). */
+function followPose(out: Pose) {
+  const dx = (ship.pos.x - SHIP.spawn.x) * SHIP.camera.follow
+  const dy = (ship.pos.y - SHIP.spawn.y) * SHIP.camera.follow
+  out.pos.set(RIG.home.pos.x + dx, RIG.home.pos.y + dy, RIG.home.pos.z)
+  out.target.set(RIG.home.target.x + dx, RIG.home.target.y + dy, RIG.home.target.z)
+  out.fov = RIG.home.fov
+  return out
+}
+
 const easeInOutCubic = (u: number) => (u < 0.5 ? 4 * u * u * u : 1 - (-2 * u + 2) ** 3 / 2)
 /** dive in: gentle start, accelerating into the core, short settle */
 const easeDive = (u: number) => (u < 0.85 ? 0.92 * (u / 0.85) ** 2.2 : 0.92 + 0.08 * (1 - (1 - (u - 0.85) / 0.15) ** 2))
@@ -49,6 +61,9 @@ export function CameraRig() {
     from: poseFor(null),
     to: poseFor(null),
     cur: poseFor(null),
+    /** lagged ship-follow pose; this is "home" once the ship exists */
+    follow: poseFor(null),
+    desired: poseFor(null),
     start: 0,
     duration: 0,
     arc: 0,
@@ -69,10 +84,19 @@ export function CameraRig() {
     const phase = useIntro.getState().phase
     const reduced = prefersReducedMotion()
 
+    // Home follows the ship with a gentle lag.
+    followPose(r.desired)
+    if (!r.init) copyPose(r.follow, r.desired)
+    else {
+      const k = 1 - Math.exp(-(reduced ? SHIP.camera.lagReduced : SHIP.camera.lag) * dt)
+      r.follow.pos.lerp(r.desired.pos, k)
+      r.follow.target.lerp(r.desired.target, k)
+    }
+
     // Start a flight when the active destination changes.
     const key = activeId ?? 'home'
     if (key !== r.key) {
-      const to = poseFor(clusterById(activeId))
+      const to = activeId ? poseFor(clusterById(activeId)) : r.follow
       if (!r.init || reduced) {
         // first frame (deep link) or reduced motion: no flight
         copyPose(r.cur, to)
@@ -92,6 +116,8 @@ export function CameraRig() {
     }
 
     if (r.duration > 0) {
+      // flying home: land on the (possibly moving) follow pose
+      if (!activeId) copyPose(r.to, r.follow)
       const u = Math.min(1, (now - r.start) / r.duration)
       const e = r.diving ? easeDive(u) : easeInOutCubic(u)
       // aim swings onto the cluster quickly, position follows
@@ -105,6 +131,8 @@ export function CameraRig() {
         r.duration = 0
         setDocked(activeId)
       }
+    } else if (!activeId) {
+      copyPose(r.cur, r.follow)
     }
 
     // Compose: base pose, intro approach, drift, parallax, shake.

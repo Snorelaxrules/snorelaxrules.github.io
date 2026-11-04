@@ -102,6 +102,7 @@ Append to `content/places.json`:
 - **Jump timing and feel:** `src/intro/timeline.ts`. One timeline drives both the WebGL scene and the DOM overlays.
 - **Camera (home view, flight times, drift, parallax):** `src/scene/rig.ts`.
 - **Colours and fonts:** `src/styles/tokens.css`.
+- **The ship:** `src/scene/ship/shipConfig.ts` holds speed, acceleration, drag, banking, bounds, proximity radius, camera follow and lag, trail, and hint timing. The look is in `ShipModel.tsx`; replace its contents to use a model or sprite, keeping the nose along +x and the engine at `ENGINE_OFFSET`.
 - **Cockpit art:** `src/intro/cockpit.config.ts`. Set `frameImage` to a 16:9 PNG with transparent windows to replace the SVG frame. The instruments and lever share the same 1600×900 coordinate space, so they stay aligned.
 
 ## How it fits together
@@ -115,7 +116,7 @@ Append to `content/places.json`:
 ## Accessibility and performance
 
 - **Reduced motion** (`prefers-reduced-motion`): the jump becomes a crossfade. There is no camera drift, parallax, flights, shake, twinkle, cluster spin, or globe spin, and Motion transitions drop to opacity only.
-- **Keyboard:** the lever is focusable (Enter or Space), the destination bar mirrors every cluster, and Esc skips the intro or closes a page.
+- **Keyboard:** the lever is focusable (Enter or Space). On the galaxy, WASD or the arrow keys fly the ship and Space enters the nearest cluster in range. The destination bar mirrors every cluster, and Esc skips the intro or closes a page. Flight keys are ignored while a page is open or while typing in a field.
 - **Adaptive resolution:** the canvas steps its pixel ratio down on slow GPUs and drops to 1× while a page covers the scene.
 - **WebGL fallback:** if WebGL is unavailable or the scene crashes, the site shows a static starfield and stays fully navigable.
 - **Bundles:** vendor chunks (three, r3f, react, motion) are split for caching. The Map section (d3 + world outline) is lazy-loaded.
