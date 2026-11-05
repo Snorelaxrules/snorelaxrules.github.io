@@ -32,7 +32,7 @@ All text lives in `/content`. Edit it, commit, push. No component changes needed
 | File | What it controls |
 | --- | --- |
 | `content/site.json` | Name and tagline |
-| `content/about/dossier.json` | About → Dossier: ID-card fields, photo, résumé, redacted lines, motto |
+| `content/about/planet.json` | About → Planet Scan: the planet's look, survey readout lines, moons |
 | `content/about/timeline.json` | About → Flight Path waypoints |
 | `content/about/interests.json` | About → Constellation: one interest per star |
 | `content/about/log/*.md` | About → Ship's Log entries |
@@ -64,11 +64,37 @@ Frontmatter supports simple `key: value` pairs and `key: [a, b]` lists.
 
 ### About page
 
-The About page has four tabs, each with its own URL: `/#/about`,
+The About page has four tabs, each with its own URL: `/#/about` (Planet Scan),
 `/#/about/flight-path`, `/#/about/constellation`, `/#/about/log`.
 Photos are optional everywhere. Use a path under `/public` (e.g.
 `/images/flight/robotics.jpg`); an empty or missing photo shows a generated
 placeholder.
+
+**Planet Scan** (`content/about/planet.json`):
+
+- `planet.seed` reshapes the continents (any number). `seaLevel` (0–1) sets how
+  much is ocean. `rotationSpeed` is in radians per second. `clouds` turns the
+  cloud layer on or off.
+- `planet.colors` holds the hex colours for `deepOcean`, `ocean`, `shallows`,
+  `land`, `highlands` (the warm accent), `ice`, `clouds`, `atmosphere` (the rim
+  glow), and `cityLights` (the dots on the night side).
+- `readout` is the list of survey lines, shown in order. Each line is either
+  `{ "label", "value", "note"? }` or `{ "label", "composition": [{ "name", "percent", "note"? }] }`
+  for the percent bar. `unexplored` lines become hover-to-reveal redaction bars.
+  `transmission` is the quoted motto, and `resume` is the button link.
+- `moons` can be added or removed freely:
+
+  ```json
+  { "name": "Watching", "value": "[a show]", "image": "", "color": "#9db4ff", "size": 0.09, "radius": 1.65, "speed": 0.35, "tilt": -6 }
+  ```
+
+  `radius` is the orbit in planet radii (keep it between about 1.4 and 2.1 so it
+  stays in frame). `speed` is in radians per second, `tilt` is the orbit's
+  incline in degrees, and `image` is optional.
+
+The scan animation plays once per session. The old ID-card Dossier is still in
+`src/sections/about/Dossier.tsx` with `content/about/dossier.json`; uncomment its
+two lines in `About.tsx` to bring it back.
 
 **Add a timeline waypoint:** append to `waypoints` in `content/about/timeline.json`.
 Waypoints show in array order, and the tracker adapts to any count.
@@ -158,4 +184,5 @@ Append to `content/places.json`:
 - **Keyboard:** the lever is focusable (Enter or Space). On the galaxy, WASD or the arrow keys fly the ship and Space enters the nearest cluster in range. Click-and-drag on empty space pans the view; flying eases it back onto the ship. The destination bar mirrors every cluster, and Esc skips the intro or closes a page. Flight keys are ignored while a page is open or while typing in a field.
 - **Adaptive resolution:** the canvas steps its pixel ratio down on slow GPUs and drops to 1× while a page covers the scene.
 - **WebGL fallback:** if WebGL is unavailable or the scene crashes, the site shows a static starfield and stays fully navigable.
+- **One render loop at a time:** while About is open, the galaxy canvas pauses (it holds its last frame behind the blur). Planet Scan's own canvas mounts only on that tab, with the pixel ratio capped at 1.5×.
 - **Bundles:** vendor chunks (three, r3f, react, motion) are split for caching. The Map section (d3 + world outline) is lazy-loaded.

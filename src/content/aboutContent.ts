@@ -1,5 +1,6 @@
 import dossierRaw from '../../content/about/dossier.json'
 import interestsRaw from '../../content/about/interests.json'
+import planetRaw from '../../content/about/planet.json'
 import timelineRaw from '../../content/about/timeline.json'
 import { parseFrontmatter, renderMarkdown, str } from './markdown'
 
@@ -64,3 +65,43 @@ export function stardate(iso: string) {
   const day = Math.floor((d.getTime() - start) / 86_400_000)
   return `Stardate ${d.getUTCFullYear()}.${String(day).padStart(3, '0')}`
 }
+
+// --- Planet Scan ----------------------------------------------------------------
+
+
+export interface PlanetLook {
+  seed: number
+  seaLevel: number
+  rotationSpeed: number
+  clouds: boolean
+  colors: Record<
+    'deepOcean' | 'ocean' | 'shallows' | 'land' | 'highlands' | 'ice' | 'clouds' | 'atmosphere' | 'cityLights',
+    string
+  >
+}
+
+export type ReadoutLine =
+  | { label: string; value: string; note?: string }
+  | { label: string; composition: { name: string; percent: number; note?: string }[] }
+
+export interface Moon {
+  name: string
+  value: string
+  image: string
+  color: string
+  size: number
+  radius: number
+  speed: number
+  tilt: number
+}
+
+export interface PlanetScanContent {
+  planet: PlanetLook
+  readout: ReadoutLine[]
+  unexplored: string[]
+  transmission: string
+  resume: string
+  moons: Moon[]
+}
+
+export const planetScan = planetRaw as PlanetScanContent

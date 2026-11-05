@@ -4,13 +4,17 @@ import { Navigate, useLocation, useNavigate } from 'react-router'
 import { SectionHeader } from '../SectionHeader'
 import type { SectionProps } from '../types'
 import { Constellation } from './Constellation'
-import { Dossier } from './Dossier'
+// Dossier (ID-card) tab, retired in favour of Planet Scan but kept for a possible return.
+// To restore: uncomment this import and its TABS entry below. Content: content/about/dossier.json
+// import { Dossier } from './Dossier'
 import { FlightPath } from './FlightPath'
+import { PlanetScan } from './planet/PlanetScan'
 import { ShipsLog } from './ShipsLog'
 import './about.css'
 
 const TABS = [
-  { slug: '', label: 'Dossier', Component: Dossier },
+  { slug: '', label: 'Planet Scan', Component: PlanetScan },
+  // { slug: 'dossier', label: 'Dossier', Component: Dossier },
   { slug: 'flight-path', label: 'Flight Path', Component: FlightPath },
   { slug: 'constellation', label: 'Constellation', Component: Constellation },
   { slug: 'log', label: "Ship's Log", Component: ShipsLog },

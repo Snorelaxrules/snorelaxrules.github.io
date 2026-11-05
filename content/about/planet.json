@@ -1,0 +1,50 @@
+{
+  "$comment": "About → Planet Scan. planet: look of the 3D planet (colors are hex; seed reshapes the continents; seaLevel 0–1 sets how much is ocean). readout: survey lines in order; a line has either value (+ optional note) or composition (percent bars). moons: add or remove freely; radius is orbit size in planet radii (keep 1.4–2.1), speed is radians/second, tilt is the orbit's incline in degrees, image is optional.",
+  "planet": {
+    "seed": 7.3,
+    "seaLevel": 0.53,
+    "rotationSpeed": 0.12,
+    "clouds": true,
+    "colors": {
+      "deepOcean": "#04102a",
+      "ocean": "#0b3a6b",
+      "shallows": "#1c8a9c",
+      "land": "#1f6f6b",
+      "highlands": "#c08a52",
+      "ice": "#dfeeff",
+      "clouds": "#e8f4ff",
+      "atmosphere": "#7ae0ff",
+      "cityLights": "#ffb36b"
+    }
+  },
+  "readout": [
+    { "label": "Designation", "value": "Talus Leong", "note": "catalogued locally as Planet Talus" },
+    { "label": "Classification", "value": "Sophomore-class world, Cornell University", "note": "still cooling; tectonically very active" },
+    { "label": "Home star", "value": "Cupertino, California", "note": "origin of all early light" },
+    { "label": "Current orbit", "value": "Ithaca, NY (Cornell University)", "note": "stable orbit, seasonal snowfall" },
+    {
+      "label": "Surface composition",
+      "composition": [
+        { "name": "Computer Science", "percent": 70, "note": "primary crust" },
+        { "name": "AI", "percent": 18, "note": "mineral deposit" },
+        { "name": "Business", "percent": 12, "note": "mineral deposit" }
+      ]
+    },
+    { "label": "Atmosphere", "value": "[Placeholder: e.g. boba, coffee, late-night ramen]" },
+    { "label": "Signal languages", "value": "[Placeholder: languages you speak]" },
+    { "label": "Active missions", "value": "[Placeholder: what you're working on]" },
+    { "label": "Population", "value": "1", "note": "visitors welcome" }
+  ],
+  "unexplored": [
+    "[Placeholder: a fun fact, revealed on hover]",
+    "[Placeholder: a surprising skill]",
+    "[Placeholder: a secret favorite thing]"
+  ],
+  "transmission": "[Placeholder: your motto]",
+  "resume": "/resume.pdf",
+  "moons": [
+    { "name": "Reading", "value": "[Placeholder: book]", "image": "", "color": "#cfd9ff", "size": 0.085, "radius": 1.5, "speed": 0.42, "tilt": 8 },
+    { "name": "Playing", "value": "[Placeholder: game]", "image": "", "color": "#7ae0ff", "size": 0.1, "radius": 1.8, "speed": 0.3, "tilt": -14 },
+    { "name": "Listening", "value": "[Placeholder: album or artist]", "image": "", "color": "#ffb36b", "size": 0.08, "radius": 2.08, "speed": 0.22, "tilt": 20 }
+  ]
+}

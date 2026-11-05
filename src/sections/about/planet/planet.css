@@ -1,0 +1,401 @@
+/* About → Planet Scan. Shares the About tabs' language: hairlines, spaced caps, amber accents. */
+
+.planet-scan {
+  display: grid;
+  grid-template-columns: minmax(0, 1.15fr) minmax(300px, 1fr);
+  gap: 28px;
+  align-items: start;
+}
+
+@media (max-width: 900px) {
+  .planet-scan {
+    grid-template-columns: 1fr;
+  }
+}
+
+/* --- stage ------------------------------------------------------------------- */
+
+.planet-stage {
+  position: relative;
+  aspect-ratio: 1 / 1;
+  max-height: 600px;
+  overflow: hidden;
+  border: 1px solid var(--line);
+  border-radius: 16px;
+  background:
+    radial-gradient(circle at 50% 50%, rgb(29 59 138 / 0.18), transparent 60%),
+    rgb(3 6 14 / 0.65);
+  cursor: grab;
+  touch-action: none;
+  user-select: none;
+}
+
+.planet-stage:active {
+  cursor: grabbing;
+}
+
+.planet-stage canvas {
+  display: block;
+}
+
+/* faint survey reticle behind the planet */
+.stage-ring {
+  position: absolute;
+  inset: 9%;
+  border: 1px dashed rgb(122 224 255 / 0.09);
+  border-radius: 50%;
+  pointer-events: none;
+}
+
+.stage-caption {
+  position: absolute;
+  left: 0;
+  right: 0;
+  bottom: 14px;
+  margin: 0;
+  text-align: center;
+  font: 500 10px var(--font-display);
+  letter-spacing: 0.25em;
+  text-transform: uppercase;
+  color: var(--fg-muted);
+  opacity: 0.6;
+  pointer-events: none;
+}
+
+/* scan line sweeping left → right once */
+.scan-sweep {
+  position: absolute;
+  top: 0;
+  bottom: 0;
+  left: 0;
+  width: 18%;
+  pointer-events: none;
+  background: linear-gradient(90deg, transparent, rgb(122 224 255 / 0.12) 70%, rgb(122 224 255 / 0.65) 99%, transparent);
+  border-right: 1px solid rgb(122 224 255 / 0.9);
+  box-shadow: 6px 0 18px rgb(122 224 255 / 0.35);
+  animation: sweep 1.5s cubic-bezier(0.45, 0, 0.3, 1) forwards;
+}
+
+@keyframes sweep {
+  from {
+    transform: translateX(-100%);
+    opacity: 1;
+  }
+  90% {
+    opacity: 1;
+  }
+  to {
+    transform: translateX(560%);
+    opacity: 0;
+  }
+}
+
+/* --- moons (DOM buttons that track the 3D moons) ------------------------------ */
+
+.moon-btn {
+  position: relative;
+  display: block;
+  width: 30px;
+  height: 30px;
+  padding: 0;
+  border: 1px solid transparent;
+  border-radius: 50%;
+  background: none;
+  cursor: pointer;
+  transition:
+    border-color 0.2s,
+    opacity 0.2s;
+}
+
+.moon-btn[data-hidden='true'] {
+  opacity: 0;
+  pointer-events: none;
+}
+
+.moon-btn:hover,
+.moon-btn:focus-visible,
+.moon-btn.is-active {
+  border-color: rgb(255 179 107 / 0.7);
+  outline: none;
+}
+
+.moon-label {
+  position: absolute;
+  top: calc(100% + 4px);
+  left: 50%;
+  transform: translateX(-50%);
+  padding: 2px 8px;
+  border-radius: 4px;
+  background: rgb(4 6 13 / 0.75);
+  color: var(--fg);
+  font: 600 10px var(--font-display);
+  letter-spacing: 0.2em;
+  text-transform: uppercase;
+  white-space: nowrap;
+  opacity: 0;
+  transition: opacity 0.2s;
+  pointer-events: none;
+}
+
+.moon-btn:hover .moon-label,
+.moon-btn:focus-visible .moon-label,
+.moon-btn.is-active .moon-label {
+  opacity: 1;
+}
+
+.moon-card {
+  position: absolute;
+  left: 16px;
+  right: 16px;
+  bottom: 40px;
+  max-width: 320px;
+  margin: 0 auto;
+  padding: 16px 18px;
+  border: 1px solid rgb(255 179 107 / 0.45);
+  border-radius: 12px;
+  background: rgb(6 10 20 / 0.85);
+  backdrop-filter: blur(8px);
+  box-shadow: 0 0 30px rgb(255 179 107 / 0.12);
+  cursor: default;
+}
+
+.moon-card-close {
+  position: absolute;
+  top: 6px;
+  right: 8px;
+  width: 26px;
+  height: 26px;
+  border: 0;
+  background: none;
+  color: var(--fg-muted);
+  font-size: 18px;
+  cursor: pointer;
+}
+
+.moon-card-close:hover {
+  color: var(--fg);
+}
+
+.moon-card-kicker {
+  margin: 0 0 6px;
+  font: 500 11px var(--font-display);
+  letter-spacing: 0.22em;
+  text-transform: uppercase;
+  color: var(--accent-warm);
+}
+
+.moon-card-photo {
+  aspect-ratio: 16 / 9;
+  margin-bottom: 10px;
+  border-radius: 8px;
+}
+
+.moon-card-value {
+  margin: 0;
+}
+
+/* --- readout -------------------------------------------------------------------- */
+
+.readout {
+  position: relative;
+  overflow: hidden;
+  border: 1px solid var(--line);
+  border-radius: 16px;
+  background: linear-gradient(160deg, rgb(122 224 255 / 0.05), rgb(6 10 20 / 0.55) 45%);
+}
+
+.readout::after {
+  content: '';
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+  background: repeating-linear-gradient(0deg, rgb(122 224 255 / 0.025) 0 1px, transparent 1px 4px);
+}
+
+.readout-head {
+  display: flex;
+  justify-content: space-between;
+  gap: 12px;
+  padding: 12px 20px;
+  border-bottom: 1px solid var(--line);
+  background: rgb(122 224 255 / 0.04);
+  font: 500 11px var(--font-display);
+  letter-spacing: 0.22em;
+  text-transform: uppercase;
+  color: var(--fg-muted);
+}
+
+.readout-status {
+  color: var(--accent);
+}
+
+.readout-status.is-scanning {
+  color: var(--accent-warm);
+}
+
+.readout-lines {
+  display: grid;
+  gap: 14px;
+  margin: 0;
+  padding: 18px 20px 4px;
+}
+
+.readout-row {
+  display: grid;
+  gap: 3px;
+  transition: opacity 0.15s;
+}
+
+.readout-row dt {
+  font: 500 10px var(--font-display);
+  letter-spacing: 0.24em;
+  text-transform: uppercase;
+  color: var(--fg-muted);
+}
+
+.readout-row dt::before {
+  content: '▸ ';
+  color: var(--accent-warm);
+}
+
+.readout-row dd {
+  margin: 0;
+  font: 0.9rem / 1.55 var(--font-mono);
+  color: #d6ecf5;
+}
+
+.readout-note {
+  color: var(--fg-muted);
+  transition: opacity 0.3s;
+}
+
+.readout-num {
+  color: var(--accent);
+}
+
+.composition-bar {
+  display: flex;
+  height: 8px;
+  margin: 4px 0 8px;
+  overflow: hidden;
+  border-radius: 4px;
+  background: rgb(122 224 255 / 0.08);
+}
+
+.composition-bar span {
+  height: 100%;
+}
+
+.composition-bar span:nth-child(1),
+.composition-legend li:nth-child(1) i {
+  background: var(--accent);
+}
+
+.composition-bar span:nth-child(2),
+.composition-legend li:nth-child(2) i {
+  background: #3fb6a8;
+}
+
+.composition-bar span:nth-child(3),
+.composition-legend li:nth-child(3) i {
+  background: var(--accent-warm);
+}
+
+.composition-bar span:nth-child(n + 4),
+.composition-legend li:nth-child(n + 4) i {
+  background: #9db4ff;
+}
+
+.composition-legend {
+  display: grid;
+  gap: 2px;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+  font-size: 0.82rem;
+}
+
+.composition-legend i {
+  display: inline-block;
+  width: 8px;
+  height: 8px;
+  margin-right: 8px;
+  border-radius: 2px;
+}
+
+.composition-legend strong {
+  font-weight: 600;
+}
+
+.readout-redacted {
+  display: grid;
+  gap: 6px;
+  margin: 2px 0 0;
+  padding: 0;
+  list-style: none;
+}
+
+.readout-quote {
+  color: var(--accent-warm) !important;
+  font-style: italic;
+}
+
+.readout-controls {
+  display: flex;
+  gap: 10px;
+  padding: 16px 20px 20px;
+}
+
+/* bracketed console-style buttons */
+.scan-btn {
+  position: relative;
+  padding: 8px 16px;
+  border: 1px solid var(--line);
+  border-radius: 4px;
+  background: rgb(122 224 255 / 0.06);
+  color: var(--accent);
+  font: 600 11px var(--font-display);
+  letter-spacing: 0.22em;
+  text-transform: uppercase;
+  text-decoration: none;
+  transition:
+    background 0.2s,
+    border-color 0.2s;
+}
+
+.scan-btn::before,
+.scan-btn::after {
+  color: var(--accent-warm);
+  opacity: 0.8;
+}
+
+.scan-btn::before {
+  content: '[ ';
+}
+
+.scan-btn::after {
+  content: ' ]';
+}
+
+.scan-btn:hover {
+  border-color: var(--accent);
+  background: rgb(122 224 255 / 0.14);
+}
+
+.readout-skip {
+  position: absolute;
+  right: 20px;
+  bottom: 24px;
+  margin: 0;
+  font: 500 10px var(--font-display);
+  letter-spacing: 0.22em;
+  text-transform: uppercase;
+  color: var(--fg-muted);
+  opacity: 0.7;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .scan-sweep {
+    display: none;
+  }
+}
