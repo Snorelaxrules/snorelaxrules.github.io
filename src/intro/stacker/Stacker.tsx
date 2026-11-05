@@ -1,13 +1,20 @@
-import { type PointerEvent as ReactPointerEvent, useEffect, useRef, useState } from 'react'
+import { type FocusEvent, type FormEvent, type PointerEvent as ReactPointerEvent, useEffect, useRef, useState } from 'react'
 import { useIntro } from '../../state/introStore'
 import { useCharge } from './charge'
-import type { Action } from './config'
+import { type Action, RULES } from './config'
 import { Game } from './engine'
 import { InputController, KEY_ACTIONS } from './input'
+import { NAME_MAX, type Score, addScore, lastName, loadScores, qualifies } from './leaderboard'
 import { drawBoard, drawPieces } from './render'
 import './stacker.css'
 
-type Status = 'idle' | 'running' | 'paused' | 'over'
+/** idle: title + leaderboard · entry: name field after a qualifying run · board: results */
+type Status = 'idle' | 'running' | 'paused' | 'entry' | 'board'
+
+interface RunResult {
+  lines: number
+  timeUp: boolean
+}
 
 interface KeyEvt {
   down: boolean
@@ -37,9 +44,15 @@ export function Stacker() {
   const gameRef = useRef<Game | null>(null)
   const inputRef = useRef<InputController | null>(null)
   const queueRef = useRef<KeyEvt[]>([])
+  const nameRef = useRef<HTMLInputElement>(null)
 
   const [status, setStatus] = useState<Status>('idle')
   const [focused, setFocused] = useState(false)
+  const [scores, setScores] = useState<Score[]>(loadScores)
+  const [result, setResult] = useState<RunResult | null>(null)
+  /** index of the run just saved, highlighted on the board */
+  const [placed, setPlaced] = useState(-1)
+  const [name, setName] = useState(lastName)
   const engaged = useIntro((s) => s.phase !== 'cockpit')
   const running = focused && status === 'running' && !engaged
 
@@ -53,7 +66,8 @@ export function Stacker() {
     }
     set(linesRef.current, String(game?.lines ?? 0))
     set(levelRef.current, String(game?.level ?? 1))
-    set(timeRef.current, fmtTime(game?.time ?? 0))
+    const t = game?.time ?? 0
+    set(timeRef.current, fmtTime(RULES.timeLimit > 0 ? RULES.timeLimit - t : t))
   }
 
   const newGame = () => {
@@ -63,18 +77,44 @@ export function Stacker() {
     inputRef.current ??= new InputController()
     inputRef.current.reset()
     queueRef.current.length = 0
+    setResult(null)
+    setPlaced(-1)
     setStatus('running')
   }
 
   const play = () => {
-    if (status === 'idle') newGame()
+    if (status === 'idle' || status === 'board') newGame()
     else if (status === 'paused') setStatus('running')
   }
 
+  /** the run ended (time up or topped out): name entry if it makes the board */
+  const finish = (game: Game) => {
+    const run = { lines: game.lines, timeUp: game.timeUp }
+    setResult(run)
+    const board = loadScores()
+    setScores(board)
+    setStatus(qualifies(run.lines, board) ? 'entry' : 'board')
+  }
+
+  const save = (e?: FormEvent) => {
+    e?.preventDefault()
+    if (status !== 'entry' || !result) return
+    const { scores: board, index } = addScore(name, result.lines)
+    setScores(board)
+    setPlaced(index)
+    setStatus('board')
+    rootRef.current?.focus({ preventScroll: true })
+  }
+
+  const skipEntry = () => {
+    setStatus('board')
+    rootRef.current?.focus({ preventScroll: true })
+  }
+
   // the latest render's handlers, for long-lived listeners and the loop
-  const api = useRef({ paint, play, newGame, status })
+  const api = useRef({ paint, play, newGame, finish, skipEntry, status })
   useEffect(() => {
-    api.current = { paint, play, newGame, status }
+    api.current = { paint, play, newGame, finish, skipEntry, status }
   })
 
   // canvases track their CSS size × devicePixelRatio
@@ -105,9 +145,21 @@ export function Stacker() {
     api.current.paint()
   }, [status, focused])
 
+  // a qualifying run: straight into the name field (only if the player is still here)
+  useEffect(() => {
+    if (status !== 'entry') return
+    const root = rootRef.current
+    if (root && root.contains(document.activeElement)) {
+      nameRef.current?.focus({ preventScroll: true })
+      nameRef.current?.select()
+    }
+  }, [status])
+
   // engaging hyperdrive (or skipping the intro) takes focus away and the screen fades out
   useEffect(() => {
-    if (engaged) rootRef.current?.blur()
+    const root = rootRef.current
+    const active = document.activeElement
+    if (engaged && root && active instanceof HTMLElement && root.contains(active)) active.blur()
   }, [engaged])
 
   // keyboard ownership while focused
@@ -117,6 +169,15 @@ export function Stacker() {
     const stamp = (e: Event) => (e.timeStamp > 0 ? Math.min(e.timeStamp, performance.now()) : performance.now())
 
     const onKeyDown = (e: KeyboardEvent) => {
+      if (api.current.status === 'entry') {
+        // typing a name: keys belong to the field; Esc skips saving
+        if (e.key === 'Escape') {
+          e.preventDefault()
+          e.stopPropagation()
+          api.current.skipEntry()
+        }
+        return
+      }
       if (e.key === 'Escape') {
         // unfocus (and pause) before the intro's Esc-to-skip sees it
         e.preventDefault()
@@ -149,10 +210,13 @@ export function Stacker() {
       e.stopPropagation()
       queueRef.current.push({ down: false, action, t: stamp(e) })
     }
-    const onPointerDown = (e: PointerEvent) => {
-      if (!root?.contains(e.target as Node)) root?.blur()
+    const leave = () => {
+      const active = document.activeElement
+      if (root && active instanceof HTMLElement && root.contains(active)) active.blur()
     }
-    const leave = () => root?.blur()
+    const onPointerDown = (e: PointerEvent) => {
+      if (!root?.contains(e.target as Node)) leave()
+    }
     const onVisibility = () => {
       if (document.hidden) leave()
     }
@@ -192,12 +256,12 @@ export function Stacker() {
       }
       q.length = 0
       input.update(now, game)
-      game.tick(dt, input.gravityFactor)
+      game.tick(dt, input.gravityFactor, input.softHeld)
       // a piece that just spawned inherits the DAS charge / soft drop straight away
       input.update(now, game)
       api.current.paint()
       if (game.over) {
-        setStatus('over')
+        api.current.finish(game)
         return
       }
       loop.raf = requestAnimationFrame(frame)
@@ -213,20 +277,25 @@ export function Stacker() {
 
   const onPointerDown = (e: ReactPointerEvent<HTMLDivElement>) => {
     if (engaged || e.button !== 0) return
+    // the name field and its button take clicks normally
+    if (status === 'entry') return
     e.preventDefault()
     rootRef.current?.focus({ preventScroll: true })
     play()
   }
 
-  const onBlur = () => {
+  const onBlur = (e: FocusEvent) => {
+    // focus moving within the screen (e.g. into the name field) isn't leaving it
+    if (rootRef.current?.contains(e.relatedTarget as Node | null)) return
     setFocused(false)
     if (status === 'running') setStatus('paused')
   }
 
   let prompt: string | null = null
-  if (status === 'over') prompt = focused ? 'Game over · press R' : 'Game over · click, then R'
-  else if (status === 'idle') prompt = focused ? 'Press Enter to play' : 'Click to play'
-  else if (status === 'paused' || !focused) prompt = focused ? 'Press Enter to resume' : 'Paused · click to resume'
+  if (status === 'running' || status === 'paused') {
+    if (status === 'paused' || !focused) prompt = focused ? 'Press Enter to resume' : 'Paused · click to resume'
+  }
+  const showPanel = status === 'idle' || status === 'entry' || status === 'board'
 
   return (
     <div
@@ -242,7 +311,8 @@ export function Stacker() {
       onBlur={onBlur}
     >
       <p id="stacker-help" className="sr-only">
-        Click or press Enter to play. Left and right arrows move, down soft drops, space hard drops, up or X rotates clockwise, Z
+        One-minute run: clear as many lines as you can, then add your name to the leaderboard. Click or press Enter to play.
+        Left and right arrows move, down soft drops, space hard drops, up or X rotates clockwise, Z
         counterclockwise, A 180 degrees, Shift or C holds. R restarts, Escape pauses.
       </p>
       <div className="stacker-side">
@@ -267,7 +337,7 @@ export function Stacker() {
       <div className="stacker-well">
         <canvas ref={boardRef} className="stacker-board" aria-hidden="true" />
         {prompt && (
-          <p className={`stacker-prompt${status === 'over' ? ' is-over' : ''}`} aria-live="polite">
+          <p className="stacker-prompt" aria-live="polite">
             {prompt}
           </p>
         )}
@@ -276,6 +346,66 @@ export function Stacker() {
         <span className="stacker-label">Next</span>
         <canvas ref={nextRef} className="stacker-next" aria-hidden="true" />
       </div>
+      {showPanel && (
+        <div className="stacker-panel" aria-live="polite">
+          <div className="stacker-panel-main">
+            {status === 'idle' || !result ? (
+              <>
+                <p className="stacker-kicker">Cargo loader</p>
+                <p className="stacker-title">One minute</p>
+                <p className="stacker-copy">Clear as many lines as you can.</p>
+              </>
+            ) : (
+              <>
+                <p className={`stacker-kicker${result.timeUp ? '' : ' is-warm'}`}>{result.timeUp ? 'Time' : 'Topped out'}</p>
+                <p className="stacker-title">
+                  <span className="stacker-score">{result.lines}</span> {result.lines === 1 ? 'line' : 'lines'}
+                </p>
+              </>
+            )}
+            {status === 'entry' ? (
+              <form className="stacker-entry" onSubmit={save}>
+                <label>
+                  <span>New high score · your name</span>
+                  <input
+                    ref={nameRef}
+                    value={name}
+                    maxLength={NAME_MAX}
+                    spellCheck={false}
+                    autoComplete="nickname"
+                    tabIndex={engaged ? -1 : 0}
+                    onChange={(e) => setName(e.target.value)}
+                  />
+                </label>
+                <button type="submit" tabIndex={engaged ? -1 : 0}>
+                  Save
+                </button>
+                <p className="stacker-hint">Enter saves · Esc skips</p>
+              </form>
+            ) : (
+              <p className="stacker-play">
+                {focused ? `Press Enter${status === 'board' ? ' or R' : ''} to play` : 'Click to play'}
+              </p>
+            )}
+          </div>
+          <div className="stacker-panel-board">
+            <p className="stacker-kicker">Leaderboard</p>
+            {scores.length ? (
+              <ol className="stacker-scores">
+                {scores.map((s, i) => (
+                  <li key={`${s.at}-${i}`} className={i === placed ? 'is-new' : undefined}>
+                    <span className="rank">{i + 1}</span>
+                    <span className="who">{s.name}</span>
+                    <span className="lines">{s.lines}</span>
+                  </li>
+                ))}
+              </ol>
+            ) : (
+              <p className="stacker-copy">No runs yet. Set the first score.</p>
+            )}
+          </div>
+        </div>
+      )}
     </div>
   )
 }

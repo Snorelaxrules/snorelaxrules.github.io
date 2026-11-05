@@ -85,6 +85,8 @@ export class Game {
   /** game time in ms (only advances in tick) */
   time = 0
   over = false
+  /** the game ended because the time limit ran out (not a top-out) */
+  timeUp = false
   /** increments on every spawn (input uses it to notice new pieces) */
   pieceCount = 0
   /** index of the kick test used by the last successful rotation (0 = no kick) */
@@ -221,10 +223,18 @@ export class Game {
   /**
    * Advance time: gravity and lock delay. `softFactor` multiplies gravity
    * (finite soft drop factors); infinite soft drop is handled by softDrop().
+   * `softHeld` shortens the lock delay to `rules.softDropLockDelay`.
    */
-  tick(dt: number, softFactor = 1) {
+  tick(dt: number, softFactor = 1, softHeld = false) {
     if (this.over || !this.active) return
     this.time += dt
+    const limit = this.rules.timeLimit
+    if (limit > 0 && this.time >= limit) {
+      this.time = limit
+      this.over = true
+      this.timeUp = true
+      return
+    }
     if (this.grounded) {
       this.gravityAcc = 0
       this.touched = true
@@ -233,7 +243,8 @@ export class Game {
         return
       }
       this.lockTimer += dt
-      if (this.lockTimer >= this.rules.lockDelay) this.lock()
+      const delay = softHeld ? Math.min(this.rules.lockDelay, this.rules.softDropLockDelay) : this.rules.lockDelay
+      if (this.lockTimer >= delay) this.lock()
       return
     }
     this.gravityAcc += (dt / 1000) * this.gravity * softFactor

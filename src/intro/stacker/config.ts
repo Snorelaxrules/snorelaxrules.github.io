@@ -19,8 +19,16 @@ export type Handling = typeof HANDLING
 
 /** Game rules. */
 export const RULES = {
+  /** game length in ms; the score is lines cleared. 0 = endless */
+  timeLimit: 60_000,
   /** how long a grounded piece waits before locking */
   lockDelay: 500,
+  /**
+   * Lock delay while soft drop is held: a soft-dropped piece settles quickly
+   * instead of sliding around on the stack. Let go of soft drop to get the
+   * full delay back (e.g. to set up a spin).
+   */
+  softDropLockDelay: 100,
   /** successful moves/rotations that may reset the lock timer, per piece */
   maxLockResets: 15,
   /**

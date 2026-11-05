@@ -55,7 +55,7 @@
     "Loves cats despite being allergic"
   ],
   "motto": { "value": "So many people die thinking they still have time. Don't be one of them.", "flavor": "surface transmission" },
-  "resume": "/resume.pdf",
+  "resume": "/Talus_Leong_Resume.png",
   "moons": [
     { "name": "Reading", "value": "Sophie's World by Jostein Gaarder", "image": "", "color": "#cfd9ff", "size": 0.085, "radius": 1.5, "speed": 0.42, "tilt": 8 },
     { "name": "Playing", "value": "Wild Rift", "image": "", "color": "#7ae0ff", "size": 0.1, "radius": 1.8, "speed": 0.3, "tilt": -14 },

@@ -32,6 +32,11 @@ export class InputController {
     this.h = { ...HANDLING, ...handling }
   }
 
+  /** Soft drop is held (Game.tick uses the shorter lock delay). */
+  get softHeld() {
+    return this.soft
+  }
+
   /** Gravity multiplier for Game.tick (finite soft drop factors). */
   get gravityFactor() {
     return this.soft && Number.isFinite(this.h.sdf) ? this.h.sdf : 1
@@ -102,6 +107,10 @@ export class InputController {
       if (this.seenPiece !== -1) this.cut(now)
       this.seenPiece = game.pieceCount
     }
+    // soft drop finishes first, so a held direction slides the piece along
+    // the floor/stack rather than across the top and then down
+    const instantSoft = this.soft && !Number.isFinite(this.h.sdf)
+    if (instantSoft) game.softDrop()
     if (this.dir !== 0 && now >= this.cutUntil) {
       const charged = now - this.dasStart - this.h.das
       if (charged >= 0) {
@@ -113,7 +122,8 @@ export class InputController {
         }
       }
     }
-    if (this.soft && !Number.isFinite(this.h.sdf)) game.softDrop()
+    // ...and again after a slide, in case it moved over a gap
+    if (instantSoft) game.softDrop()
   }
 
   reset() {

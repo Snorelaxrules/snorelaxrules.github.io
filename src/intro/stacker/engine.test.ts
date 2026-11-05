@@ -235,10 +235,13 @@ describe('lock delay and game over', () => {
   })
 })
 
+/** handling the mechanics tests are written against (independent of the tuned defaults) */
+const PRO = { das: 75, arr: 0, dcd: 0, sdf: Infinity }
+
 describe('handling', () => {
   it('DAS 75 ms, ARR 0: taps one cell, then slides to the wall once charged', () => {
     const game = gameWith('T')
-    const input = new InputController()
+    const input = new InputController(PRO)
     input.press('moveRight', 0, game)
     expect(game.active!.x).toBe(4)
     input.update(74, game)
@@ -249,7 +252,7 @@ describe('handling', () => {
 
   it('newest direction wins; releasing it falls back to the other and re-charges', () => {
     const game = gameWith('T')
-    const input = new InputController()
+    const input = new InputController(PRO)
     input.press('moveLeft', 0, game)
     input.press('moveRight', 10, game)
     input.update(84, game)
@@ -265,7 +268,7 @@ describe('handling', () => {
 
   it('DAS charge survives rotation and new pieces (DCD 0)', () => {
     const game = gameWith('T')
-    const input = new InputController()
+    const input = new InputController(PRO)
     input.press('moveLeft', 0, game)
     input.update(80, game)
     expect(game.active!.x).toBe(0)
@@ -277,7 +280,7 @@ describe('handling', () => {
 
   it('infinite soft drop reaches the floor without locking', () => {
     const game = gameWith('T')
-    const input = new InputController()
+    const input = new InputController(PRO)
     const id = game.pieceCount
     input.press('softDrop', 0, game)
     expect(game.grounded).toBe(true)
@@ -286,5 +289,50 @@ describe('handling', () => {
     expect(game.pieceCount).toBe(id)
     game.tick(1)
     expect(game.pieceCount).toBe(id + 1)
+  })
+  it('held soft drop lands the piece before a held direction slides it (along the floor, not the top)', () => {
+    // a wall on the right near the floor: sliding at the top would clear it, along the floor it can't
+    const game = gameWith('T', ['......#...', '......#...'])
+    const input = new InputController(PRO)
+    input.press('softDrop', 0, game)
+    input.press('moveRight', 1, game)
+    input.update(200, game)
+    expect(game.grounded).toBe(true)
+    expect(Math.max(...pieceCells(game.active!).map(([x]) => x))).toBe(5)
+  })
+
+  it('a grounded piece locks after the short delay while soft drop is held, the full one otherwise', () => {
+    const held = gameWith('T')
+    held.softDrop()
+    const id = held.pieceCount
+    held.tick(99, 1, true)
+    expect(held.pieceCount).toBe(id)
+    held.tick(1, 1, true)
+    expect(held.pieceCount).toBe(id + 1)
+
+    const free = gameWith('T')
+    free.softDrop()
+    free.tick(100)
+    expect(free.pieceCount).toBe(id)
+  })
+})
+
+describe('timed mode', () => {
+  it('ends when the time limit runs out, flagged as time up', () => {
+    const game = new Game({ random: seededRandom(4), rules: { timeLimit: 1000 } })
+    for (let i = 0; i < 9; i++) game.tick(100)
+    expect(game.over).toBe(false)
+    game.tick(150)
+    expect(game.over).toBe(true)
+    expect(game.timeUp).toBe(true)
+    expect(game.time).toBe(1000)
+  })
+
+  it('a top-out is not time up', () => {
+    const game = gameWith('T')
+    for (const y of [20, 21]) for (let x = 3; x < 7; x++) game.set(x, y, 8)
+    game.holdPiece()
+    expect(game.over).toBe(true)
+    expect(game.timeUp).toBe(false)
   })
 })

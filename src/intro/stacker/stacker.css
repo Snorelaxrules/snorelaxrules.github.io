@@ -148,10 +148,6 @@
   animation: stacker-pulse 2.2s ease-in-out infinite;
 }
 
-.stacker-prompt.is-over {
-  border-color: rgb(255 179 107 / 0.5);
-  color: var(--accent-warm);
-}
 
 @keyframes stacker-pulse {
   50% {
@@ -168,6 +164,184 @@
 
 @media (prefers-reduced-motion: reduce) {
   .stacker-prompt {
+    animation: none;
+  }
+}
+
+/* --- menu / results panel (idle, name entry, leaderboard) ---------------- */
+
+.stacker-panel {
+  position: absolute;
+  inset: 0;
+  z-index: 1;
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: calc(14 * var(--u));
+  padding: calc(16 * var(--u)) calc(16 * var(--u)) calc(14 * var(--u));
+  background: rgb(2 6 13 / 0.88);
+  cursor: inherit;
+}
+
+.stacker-panel-main,
+.stacker-panel-board {
+  display: flex;
+  flex-direction: column;
+  min-width: 0;
+}
+
+.stacker-panel-board {
+  padding-left: calc(14 * var(--u));
+  border-left: 1px solid rgb(122 224 255 / 0.14);
+}
+
+.stacker-panel p {
+  margin: 0;
+}
+
+.stacker-kicker {
+  font: 500 calc(7.5 * var(--u)) / 1 var(--font-display);
+  letter-spacing: 0.28em;
+  text-transform: uppercase;
+  color: rgb(122 224 255 / 0.6);
+}
+
+.stacker-kicker.is-warm {
+  color: rgb(255 179 107 / 0.8);
+}
+
+.stacker-title {
+  margin-top: calc(8 * var(--u)) !important;
+  font: 600 calc(15 * var(--u)) / 1.1 var(--font-display);
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: var(--fg);
+}
+
+.stacker-score {
+  font: 500 calc(26 * var(--u)) / 1 var(--font-mono);
+  color: var(--accent);
+  font-variant-numeric: tabular-nums;
+}
+
+.stacker-copy {
+  margin-top: calc(7 * var(--u)) !important;
+  font: 400 calc(8.5 * var(--u)) / 1.45 var(--font-body, var(--font-display));
+  color: rgb(220 232 255 / 0.62);
+}
+
+.stacker-play {
+  margin-top: auto !important;
+  color: var(--accent);
+  font: 600 calc(8 * var(--u)) / 1.3 var(--font-display);
+  letter-spacing: 0.24em;
+  text-transform: uppercase;
+  animation: stacker-pulse 2.2s ease-in-out infinite;
+}
+
+.stacker-entry {
+  display: grid;
+  grid-template-columns: 1fr auto;
+  align-items: end;
+  gap: calc(6 * var(--u));
+  margin-top: auto;
+}
+
+.stacker-entry label {
+  display: grid;
+  gap: calc(5 * var(--u));
+  min-width: 0;
+}
+
+.stacker-entry label span {
+  font: 500 calc(6.5 * var(--u)) / 1.2 var(--font-display);
+  letter-spacing: 0.2em;
+  text-transform: uppercase;
+  color: rgb(255 179 107 / 0.85);
+}
+
+.stacker-entry input {
+  width: 100%;
+  min-width: 0;
+  box-sizing: border-box;
+  padding: calc(4 * var(--u)) calc(5 * var(--u));
+  border: 1px solid rgb(122 224 255 / 0.35);
+  border-radius: calc(3 * var(--u));
+  background: rgb(122 224 255 / 0.05);
+  color: var(--fg);
+  font: 500 calc(10 * var(--u)) / 1.2 var(--font-mono);
+  outline: none;
+  cursor: text;
+  user-select: text;
+  -webkit-user-select: text;
+}
+
+.stacker-entry input:focus {
+  border-color: var(--accent);
+  box-shadow: 0 0 0 1px rgb(122 224 255 / 0.25);
+}
+
+.stacker-entry button {
+  padding: calc(4.5 * var(--u)) calc(8 * var(--u));
+  border: 1px solid rgb(255 179 107 / 0.55);
+  border-radius: calc(3 * var(--u));
+  background: rgb(255 179 107 / 0.1);
+  color: var(--accent-warm);
+  font: 600 calc(7.5 * var(--u)) / 1.2 var(--font-display);
+  letter-spacing: 0.2em;
+  text-transform: uppercase;
+  cursor: pointer;
+}
+
+.stacker-entry button:hover,
+.stacker-entry button:focus-visible {
+  background: rgb(255 179 107 / 0.2);
+  outline: none;
+}
+
+.stacker-hint {
+  grid-column: 1 / -1;
+  font: 500 calc(6.5 * var(--u)) / 1 var(--font-display);
+  letter-spacing: 0.18em;
+  text-transform: uppercase;
+  color: rgb(220 232 255 / 0.4);
+}
+
+.stacker-scores {
+  display: grid;
+  gap: calc(3.5 * var(--u));
+  margin: calc(9 * var(--u)) 0 0;
+  padding: 0;
+  list-style: none;
+  font: 500 calc(8.5 * var(--u)) / 1.2 var(--font-mono);
+  font-variant-numeric: tabular-nums;
+  color: rgb(220 232 255 / 0.78);
+}
+
+.stacker-scores li {
+  display: grid;
+  grid-template-columns: calc(14 * var(--u)) 1fr auto;
+  gap: calc(5 * var(--u));
+  padding: calc(1.5 * var(--u)) calc(4 * var(--u));
+  border-radius: calc(2 * var(--u));
+}
+
+.stacker-scores .rank {
+  color: rgb(122 224 255 / 0.5);
+}
+
+.stacker-scores .who {
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.stacker-scores li.is-new {
+  background: rgb(255 179 107 / 0.14);
+  color: var(--accent-warm);
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .stacker-play {
     animation: none;
   }
 }
