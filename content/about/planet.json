@@ -1,5 +1,5 @@
 {
-  "$comment": "About → Planet Scan. planet: look of the 3D planet (colors are hex; seed reshapes the continents; seaLevel 0–1 sets how much is ocean). readout: survey lines in order; a line has either value (+ optional note) or composition (percent bars). moons: add or remove freely; radius is orbit size in planet radii (keep 1.4–2.1), speed is radians/second, tilt is the orbit's incline in degrees, image is optional.",
+  "$comment": "About → Planet Scan. planet: look of the 3D planet (colors are hex; seed reshapes the continents; seaLevel 0–1 sets how much is ocean). readout: sections shown in order; each row is { label, value, flavor? } where value is the plain fact and flavor is an optional short planet-joke line (~8 words max). A section may have strip: a list of names drawn as equal decorative segments (never proportions). unexplored: hover-to-reveal redacted lines under 'Classified'. motto: { value, flavor? }. moons: add or remove freely; radius is orbit size in planet radii (keep 1.4–2.1), speed is radians/second, tilt is the orbit's incline in degrees, image is optional.",
   "planet": {
     "seed": 7.3,
     "seaLevel": 0.53,
@@ -18,29 +18,43 @@
     }
   },
   "readout": [
-    { "label": "Designation", "value": "Talus Leong", "note": "catalogued locally as Planet Talus" },
-    { "label": "Classification", "value": "Sophomore-class world, Cornell University", "note": "still cooling; tectonically very active" },
-    { "label": "Home star", "value": "Cupertino, California", "note": "origin of all early light" },
-    { "label": "Current orbit", "value": "Ithaca, NY (Cornell University)", "note": "stable orbit, seasonal snowfall" },
     {
-      "label": "Surface composition",
-      "composition": [
-        { "name": "Computer Science", "percent": 70, "note": "primary crust" },
-        { "name": "AI", "percent": 18, "note": "mineral deposit" },
-        { "name": "Business", "percent": 12, "note": "mineral deposit" }
+      "title": "Identity",
+      "rows": [
+        { "label": "Name", "value": "Talus Leong", "flavor": "catalogued locally as Planet Talus" },
+        { "label": "Year & school", "value": "Sophomore at Cornell University", "flavor": "still cooling, very tectonically active" },
+        { "label": "From", "value": "Cupertino, California", "flavor": "home star, origin of all early light" },
+        { "label": "Based in", "value": "Ithaca, NY", "flavor": "stable orbit, seasonal snowfall" }
       ]
     },
-    { "label": "Atmosphere", "value": "[Placeholder: e.g. boba, coffee, late-night ramen]" },
-    { "label": "Signal languages", "value": "[Placeholder: languages you speak]" },
-    { "label": "Active missions", "value": "[Placeholder: what you're working on]" },
-    { "label": "Population", "value": "1", "note": "visitors welcome" }
+    {
+      "title": "Studies",
+      "strip": ["Computer Science", "AI", "Business"],
+      "rows": [
+        { "label": "Major", "value": "Computer Science", "flavor": "primary crust" },
+        { "label": "Minors", "value": "AI, Business", "flavor": "mineral deposits, actively mined" }
+      ]
+    },
+    {
+      "title": "Personal",
+      "rows": [
+        { "label": "Fuel", "value": "[Placeholder: e.g. boba, coffee, late-night ramen]", "flavor": "atmospheric composition" },
+        { "label": "Languages", "value": "[Placeholder: languages you speak]", "flavor": "signal frequencies detected" },
+        { "label": "Currently working on", "value": "[Placeholder: what you're working on]", "flavor": "active missions" }
+      ]
+    },
+    {
+      "rows": [
+        { "label": "Population", "value": "1", "flavor": "visitors welcome" }
+      ]
+    }
   ],
   "unexplored": [
     "[Placeholder: a fun fact, revealed on hover]",
     "[Placeholder: a surprising skill]",
     "[Placeholder: a secret favorite thing]"
   ],
-  "transmission": "[Placeholder: your motto]",
+  "motto": { "value": "[Placeholder: your motto]", "flavor": "surface transmission" },
   "resume": "/resume.pdf",
   "moons": [
     { "name": "Reading", "value": "[Placeholder: book]", "image": "", "color": "#cfd9ff", "size": 0.085, "radius": 1.5, "speed": 0.42, "tilt": 8 },

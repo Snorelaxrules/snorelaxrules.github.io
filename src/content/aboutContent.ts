@@ -80,9 +80,20 @@ export interface PlanetLook {
   >
 }
 
-export type ReadoutLine =
-  | { label: string; value: string; note?: string }
-  | { label: string; composition: { name: string; percent: number; note?: string }[] }
+/** One fact: a plain label, the fact itself, and an optional short planet-flavour line. */
+export interface ReadoutRow {
+  label: string
+  value: string
+  flavor?: string
+}
+
+export interface ReadoutSection {
+  /** plain section heading (omit for an untitled group) */
+  title?: string
+  rows: ReadoutRow[]
+  /** names drawn as equal decorative segments; never proportions */
+  strip?: string[]
+}
 
 export interface Moon {
   name: string
@@ -97,9 +108,9 @@ export interface Moon {
 
 export interface PlanetScanContent {
   planet: PlanetLook
-  readout: ReadoutLine[]
+  readout: ReadoutSection[]
   unexplored: string[]
-  transmission: string
+  motto: { value: string; flavor?: string }
   resume: string
   moons: Moon[]
 }

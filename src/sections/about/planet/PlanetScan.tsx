@@ -1,6 +1,6 @@
 import { AnimatePresence, motion } from 'motion/react'
 import { type PointerEvent, useEffect, useRef, useState } from 'react'
-import { type ReadoutLine, planetScan } from '../../../content/aboutContent'
+import { type ReadoutRow, planetScan } from '../../../content/aboutContent'
 import { contact } from '../../../content/data'
 import { prefersReducedMotion } from '../../../scene/pointer'
 import { Photo } from '../Photo'
@@ -15,8 +15,15 @@ const TYPE_TIME = 0.45
 const DRAG_RAD_PER_PX = 0.006
 
 const content = planetScan
-/** readout lines + unexplored + transmission, in reveal order */
-const STEPS = content.readout.length + 2
+/** every row gets a reveal step, in reading order; then Classified, then the motto */
+const SECTION_START = content.readout.reduce<number[]>(
+  (starts, _sec, i) => [...starts, i === 0 ? 0 : starts[i - 1] + content.readout[i - 1].rows.length],
+  [],
+)
+const ROW_COUNT = content.readout.reduce((n, sec) => n + sec.rows.length, 0)
+const STEP_CLASSIFIED = ROW_COUNT
+const STEP_MOTTO = ROW_COUNT + 1
+const STEPS = ROW_COUNT + 2
 const TOTAL = LINE_START + (STEPS - 1) * LINE_GAP + TYPE_TIME
 
 const alreadyScanned = () => {
@@ -48,42 +55,32 @@ function Typed({ text, p }: { text: string; p: number }) {
   )
 }
 
-function Line({ line, p }: { line: ReadoutLine; p: number }) {
-  if ('composition' in line) {
-    return (
-      <div className="readout-row" style={{ opacity: p > 0 ? 1 : 0 }}>
-        <dt>{line.label}</dt>
-        <dd>
-          <div className="composition-bar" aria-hidden="true">
-            {line.composition.map((c) => (
-              <span key={c.name} style={{ width: `${c.percent * p}%` }} />
-            ))}
-          </div>
-          <ul className="composition-legend">
-            {line.composition.map((c) => (
-              <li key={c.name}>
-                <i aria-hidden="true" />
-                <strong>{c.name}</strong> <span className="readout-num">{Math.round(c.percent * p)}%</span>
-                {c.note && <span className="readout-note"> · {c.note}</span>}
-              </li>
-            ))}
-          </ul>
-        </dd>
-      </div>
-    )
-  }
+/** A fact: plain label, the fact (primary), and an optional planet-flavour aside. */
+function Row({ row, p, quote = false }: { row: ReadoutRow; p: number; quote?: boolean }) {
   return (
     <div className="readout-row" style={{ opacity: p > 0 ? 1 : 0 }}>
-      <dt>{line.label}</dt>
-      <dd>
-        <Typed text={line.value} p={p} />
-        {line.note && (
-          <span className="readout-note" style={{ opacity: p >= 1 ? 1 : 0 }}>
-            {' '}
-            · {line.note}
-          </span>
-        )}
+      <dt>{row.label}</dt>
+      <dd className={`readout-value${quote ? ' is-quote' : ''}`}>
+        {quote && '“'}
+        <Typed text={row.value} p={p} />
+        {quote && '”'}
       </dd>
+      {row.flavor && (
+        <dd className="readout-flavor" style={{ opacity: p >= 1 ? 1 : 0 }}>
+          {row.flavor}
+        </dd>
+      )}
+    </div>
+  )
+}
+
+/** Decorative segments (equal widths: never a proportion). */
+function Strip({ names, p }: { names: string[]; p: number }) {
+  return (
+    <div className="readout-strip" aria-hidden="true" style={{ transform: `scaleX(${p})` }}>
+      {names.map((n) => (
+        <span key={n} title={n} />
+      ))}
     </div>
   )
 }
@@ -172,8 +169,6 @@ export function PlanetScan() {
   const p = (i: number) => (t === Infinity ? 1 : clamp01((t - (LINE_START + i * LINE_GAP)) / TYPE_TIME))
   const progress = t === Infinity ? 1 : clamp01(t / TOTAL)
   const moon = selectedMoon === null ? null : content.moons[selectedMoon]
-  const nUnexplored = content.readout.length
-  const nTransmission = nUnexplored + 1
 
   return (
     <div className="planet-scan" onClick={scanning ? skip : undefined}>
@@ -228,33 +223,44 @@ export function PlanetScan() {
             {scanning ? `Scanning ${Math.round(progress * 100)}%` : 'Scan complete'}
           </span>
         </header>
-        <dl className="readout-lines">
-          {content.readout.map((line, i) => (
-            <Line key={line.label} line={line} p={p(i)} />
+        <div className="readout-body">
+          {content.readout.map((sec, si) => (
+            <section key={sec.title ?? `section-${si}`} className="readout-section" aria-label={sec.title}>
+              {sec.title && <h3 className="readout-section-title">{sec.title}</h3>}
+              {sec.strip && sec.strip.length > 0 && <Strip names={sec.strip} p={p(SECTION_START[si])} />}
+              <dl className="readout-rows">
+                {sec.rows.map((row, ri) => (
+                  <Row key={row.label} row={row} p={p(SECTION_START[si] + ri)} />
+                ))}
+              </dl>
+            </section>
           ))}
+
           {content.unexplored.length > 0 && (
-            <div className="readout-row" style={{ opacity: p(nUnexplored) > 0 ? 1 : 0 }}>
-              <dt>Unexplored regions</dt>
-              <dd>
-                <ul className="readout-redacted">
-                  {content.unexplored.map((line) => (
-                    <li key={line}>
-                      <span className="redacted" tabIndex={0}>
-                        {line}
-                      </span>
-                    </li>
-                  ))}
-                </ul>
-              </dd>
-            </div>
+            <section className="readout-section" aria-label="Classified" style={{ opacity: p(STEP_CLASSIFIED) > 0 ? 1 : 0 }}>
+              <h3 className="readout-section-title">
+                Classified <span>· hover to reveal</span>
+              </h3>
+              <ul className="readout-redacted">
+                {content.unexplored.map((line) => (
+                  <li key={line}>
+                    <span className="redacted" tabIndex={0}>
+                      {line}
+                    </span>
+                  </li>
+                ))}
+              </ul>
+            </section>
           )}
-          <div className="readout-row" style={{ opacity: p(nTransmission) > 0 ? 1 : 0 }}>
-            <dt>Surface transmission</dt>
-            <dd className="readout-quote">
-              “<Typed text={content.transmission} p={p(nTransmission)} />”
-            </dd>
-          </div>
-        </dl>
+
+          {content.motto.value && (
+            <section className="readout-section" aria-label="Motto">
+              <dl className="readout-rows">
+                <Row row={{ label: 'Motto', ...content.motto }} p={p(STEP_MOTTO)} quote />
+              </dl>
+            </section>
+          )}
+        </div>
         <div className="readout-controls">
           <a className="scan-btn" href={`mailto:${contact.email}`}>
             Open comms

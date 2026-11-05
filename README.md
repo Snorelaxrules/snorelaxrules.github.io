@@ -78,10 +78,20 @@ placeholder.
 - `planet.colors` holds the hex colours for `deepOcean`, `ocean`, `shallows`,
   `land`, `highlands` (the warm accent), `ice`, `clouds`, `atmosphere` (the rim
   glow), and `cityLights` (the dots on the night side).
-- `readout` is the list of survey lines, shown in order. Each line is either
-  `{ "label", "value", "note"? }` or `{ "label", "composition": [{ "name", "percent", "note"? }] }`
-  for the percent bar. `unexplored` lines become hover-to-reveal redaction bars.
-  `transmission` is the quoted motto, and `resume` is the button link.
+- `readout` is a list of sections (Identity, Studies, …), shown in order:
+
+  ```json
+  { "title": "Studies", "strip": ["Computer Science", "AI", "Business"], "rows": [
+    { "label": "Major", "value": "Computer Science", "flavor": "primary crust" }
+  ] }
+  ```
+
+  Each row is `{ label, value, flavor? }`. `label` is a plain field name, `value`
+  is the fact (shown large), and `flavor` is an optional planet joke (shown small
+  underneath; keep it to about 8 words). `title` and `strip` are optional; `strip`
+  draws equal decorative segments, never proportions.
+- `unexplored` lines become hover-to-reveal bars under "Classified". `motto` is
+  `{ value, flavor? }`, and `resume` is the button link.
 - `moons` can be added or removed freely:
 
   ```json
