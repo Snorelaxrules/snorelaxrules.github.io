@@ -74,7 +74,7 @@ export function HomeHud({ visible }: { visible: boolean }) {
           aria-hidden={!inCourse}
         >
           <kbd>A</kbd>
-          <kbd>D</kbd> turn <span className="sep">·</span> <kbd>W</kbd> thrust <span className="sep">·</span> <kbd>S</kbd> reverse{' '}
+          <kbd>D</kbd> turn <span className="sep">·</span> <kbd>W</kbd> thrust <span className="sep">·</span> <kbd>S</kbd> brake{' '}
           <span className="sep">·</span> <kbd>R</kbd> respawn <span className="sep">·</span> <kbd>T</kbd> trajectory{' '}
           <span className="sep">·</span> <kbd>Esc</kbd> exit course
         </motion.p>

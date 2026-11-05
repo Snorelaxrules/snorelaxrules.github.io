@@ -45,7 +45,7 @@ All text lives in `/content`. Edit it, commit, push. No component changes needed
 | `content/secret.json` | The "Secret transmission" shown after finishing the hidden course |
 
 Static files (photo, résumé PDF, images used in posts) go in `/public` and are
-referenced from the site root, e.g. `public/Talus_Leong_Resume.png` → `/Talus_Leong_Resume.png`.
+referenced from the site root, e.g. `public/Talus_Leong_Resume.pdf` → `/Talus_Leong_Resume.pdf`.
 
 ### Add a post
 
@@ -193,12 +193,13 @@ passed ones turn green), slingshotting around three black holes and five
 planets, and dive into the wormhole. That opens the Secret transmission.
 Touching a planet or crossing an event horizon respawns you at the last ring.
 Inside the course the controls are ship-relative: A/D turn, W thrusts along the
-nose, S fires a weaker reverse thrust. R respawns, T toggles the dotted trajectory
+nose (with grip, so the ship goes where it points), S brakes. Coasting is pure
+momentum, so slingshots and the trajectory preview behave physically. R respawns, T toggles the dotted trajectory
 preview, Esc leaves. Best time and a "found it" star near the entrance are
 stored in this browser's localStorage.
 
 - **Layout and tuning:** `src/scene/course/courseConfig.ts`, with comments for
-  every value. It holds the zone, `physics` (G, thrust, reverse, turn rate, drag, speed cap,
+  every value. It holds the zone, `physics` (G, thrust, grip, brake, turn rate, drag, speed cap,
   softening fade, step size), the gate, `rings` (in pass order), `wormhole`,
   `blackHoles` (position, mass, softening, horizon, visual size), and
   `planets` (position, radius, mass, look). Gravity is
@@ -242,13 +243,16 @@ Everything tunable is in `src/intro/stacker/config.ts`:
 
 - **Handling** (`HANDLING`): `das` (75 ms), `arr` (0 = instant to the wall), `dcd` (0), `sdf` (`Infinity` = instant soft
   drop). All in milliseconds of real time, so it plays the same at 60, 120, or
-  144 Hz. A held soft drop lands the piece before a held direction moves it, so
-  it slides along the stack rather than across the top.
+  144 Hz. `carryDas` (on): a held direction's charge
+  carries into the next piece. `softDropDelay` (120 ms): with soft drop held,
+  each new piece gets this long at the top before it drops, so you can move it
+  first; a fresh press drops at once.
+  While soft dropping, sideways moves drop the piece after every cell, so it
+  falls into the first gap it passes rather than skimming over it.
 - **Keybinds** (`KEYS`): each action maps to a list of `KeyboardEvent.code`
   values (physical keys, e.g. `'KeyX'`, `'ArrowUp'`, `'ShiftLeft'`). Add or
   replace codes; a code should appear under only one action.
-- **Rules** (`RULES`): `timeLimit` (60 000 ms; 0 = endless), lock delay (500 ms; 100 ms while soft
-  drop is held, `softDropLockDelay`), lock resets (15), lines per level
+- **Rules** (`RULES`): `timeLimit` (60 000 ms; 0 = endless), lock delay (500 ms), lock resets (15), lines per level
   (10), gravity cap (cells/s), and next-queue length.
 - **Colours** (`THEME`).
 

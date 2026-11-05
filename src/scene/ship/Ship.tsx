@@ -230,9 +230,10 @@ export function Ship() {
         courseTurn = turn * COURSE.physics.turnRate
         ship.heading += courseTurn * dt
       }
-      const push = steer && course.status !== 'countdown' ? (fwd > 0 ? 1 : fwd < 0 ? -COURSE.physics.reverse : 0) : 0
-      thrusting = push > 0
-      speed = stepCourse(dt, Math.cos(ship.heading) * push, Math.sin(ship.heading) * push, reduced)
+      const live = steer && course.status !== 'countdown'
+      const engine = live && fwd > 0
+      thrusting = engine
+      speed = stepCourse(dt, engine, live && fwd < 0, reduced)
     } else if (inCourseZone(pos.x) && !flying) {
       // a page is open while parked in the course: hold still
     } else if (swallowed) {

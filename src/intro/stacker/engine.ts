@@ -172,6 +172,21 @@ export class Game {
     return n
   }
 
+  /**
+   * Slide while soft dropping: one cell at a time, dropping after each, so the
+   * piece falls into the first gap it passes instead of skimming over it.
+   * Counts as one move for lock resets.
+   */
+  slideDown(dir: -1 | 1): number {
+    let n = 0
+    while (this.step(dir)) {
+      n++
+      this.softDrop()
+    }
+    if (n) this.afterMove()
+    return n
+  }
+
   /** Infinite soft drop: straight to the floor without locking. */
   softDrop(): number {
     const p = this.active
@@ -223,9 +238,8 @@ export class Game {
   /**
    * Advance time: gravity and lock delay. `softFactor` multiplies gravity
    * (finite soft drop factors); infinite soft drop is handled by softDrop().
-   * `softHeld` shortens the lock delay to `rules.softDropLockDelay`.
    */
-  tick(dt: number, softFactor = 1, softHeld = false) {
+  tick(dt: number, softFactor = 1) {
     if (this.over || !this.active) return
     this.time += dt
     const limit = this.rules.timeLimit
@@ -243,8 +257,7 @@ export class Game {
         return
       }
       this.lockTimer += dt
-      const delay = softHeld ? Math.min(this.rules.lockDelay, this.rules.softDropLockDelay) : this.rules.lockDelay
-      if (this.lockTimer >= delay) this.lock()
+      if (this.lockTimer >= this.rules.lockDelay) this.lock()
       return
     }
     this.gravityAcc += (dt / 1000) * this.gravity * softFactor

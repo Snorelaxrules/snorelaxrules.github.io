@@ -1,64 +1,134 @@
 {
-  "$comment": "About → Planet Scan. planet: look of the 3D planet (colors are hex; seed reshapes the continents; seaLevel 0–1 sets how much is ocean). readout: sections shown in order; each row is { label, value, flavor? } where value is the plain fact and flavor is an optional short planet-joke line (~8 words max). A section may have strip: a list of names drawn as equal decorative segments (never proportions). unexplored: hover-to-reveal redacted lines under 'Classified'. motto: { value, flavor? }. moons: add or remove freely; radius is orbit size in planet radii (keep 1.4–2.1), speed is radians/second, tilt is the orbit's incline in degrees, image is optional.",
-  "planet": {
-    "seed": 7.3,
-    "seaLevel": 0.53,
-    "rotationSpeed": 0.12,
-    "clouds": true,
-    "colors": {
-      "deepOcean": "#04102a",
-      "ocean": "#0b3a6b",
-      "shallows": "#1c8a9c",
-      "land": "#1f6f6b",
-      "highlands": "#c08a52",
-      "ice": "#dfeeff",
-      "clouds": "#e8f4ff",
-      "atmosphere": "#7ae0ff",
-      "cityLights": "#ffb36b"
-    }
-  },
-  "readout": [
-    {
-      "title": "Identity",
-      "rows": [
-        { "label": "Name", "value": "Talus Leong", "flavor": "catalogued locally as Planet Talus" },
-        { "label": "Year & school", "value": "Sophomore, Cornell University", "flavor": "still cooling, very tectonically active" },
-        { "label": "From", "value": "Cupertino, California", "flavor": "home star, origin of all early light" },
-        { "label": "Based in", "value": "Ithaca, NY", "flavor": "escaping containment in 3.5 years" }
-      ]
+    "$comment": "About → Planet Scan. planet: look of the 3D planet (colors are hex; seed reshapes the continents; seaLevel 0–1 sets how much is ocean). readout: sections shown in order; each row is { label, value, flavor? } where value is the plain fact and flavor is an optional short planet-joke line (~8 words max). A section may have strip: a list of names drawn as equal decorative segments (never proportions). unexplored: hover-to-reveal redacted lines under 'Classified'. motto: { value, flavor? }. moons: add or remove freely; radius is orbit size in planet radii (keep 1.4–2.1), speed is radians/second, tilt is the orbit's incline in degrees, image is optional.",
+    "planet": {
+        "seed": 7.3,
+        "seaLevel": 0.53,
+        "rotationSpeed": 0.12,
+        "clouds": true,
+        "colors": {
+            "deepOcean": "#04102a",
+            "ocean": "#0b3a6b",
+            "shallows": "#1c8a9c",
+            "land": "#1f6f6b",
+            "highlands": "#c08a52",
+            "ice": "#dfeeff",
+            "clouds": "#e8f4ff",
+            "atmosphere": "#7ae0ff",
+            "cityLights": "#ffb36b"
+        }
     },
-    {
-      "title": "Studies",
-      "strip": ["Computer Science", "AI", "Business"],
-      "rows": [
-        { "label": "Major", "value": "Computer Science", "flavor": "primary crust" },
-        { "label": "Minors", "value": "AI, Business", "flavor": "mineral deposits, actively mined" }
-      ]
+    "readout": [
+        {
+            "title": "Identity",
+            "rows": [
+                {
+                    "label": "Name",
+                    "value": "Talus Leong",
+                    "flavor": "catalogued locally as Planet Talus"
+                },
+                {
+                    "label": "Year & school",
+                    "value": "Sophomore, Cornell University",
+                    "flavor": "still cooling, very tectonically active"
+                },
+                {
+                    "label": "From",
+                    "value": "Cupertino, California",
+                    "flavor": "home star, origin of all early light"
+                },
+                {
+                    "label": "Based in",
+                    "value": "Ithaca, NY",
+                    "flavor": "escaping containment in 3.5 years"
+                }
+            ]
+        },
+        {
+            "title": "Studies",
+            "strip": ["Computer Science", "AI", "Business"],
+            "rows": [
+                {
+                    "label": "Major",
+                    "value": "Computer Science",
+                    "flavor": "primary crust"
+                },
+                {
+                    "label": "Minors",
+                    "value": "AI, Business",
+                    "flavor": "mineral deposits, actively mined"
+                }
+            ]
+        },
+        {
+            "title": "Personal",
+            "rows": [
+                {
+                    "label": "Fuel",
+                    "value": "Ice cream, boba, grapes, and bananas",
+                    "flavor": "atmospheric composition"
+                },
+                {
+                    "label": "Languages",
+                    "value": "English, Mandarin",
+                    "flavor": "signal frequencies detected"
+                },
+                {
+                    "label": "Current mission",
+                    "value": "Taking care of those around me, sidequesting",
+                    "flavor": "orbit subject to change"
+                }
+            ]
+        },
+        {
+            "rows": [
+                {
+                    "label": "Population",
+                    "value": "1",
+                    "flavor": "visitors welcome"
+                }
+            ]
+        }
+    ],
+    "unexplored": [
+        "Loves little chats with strangers",
+        "Lowkey goated at abacus",
+        "Loves cats despite being allergic"
+    ],
+    "motto": {
+        "value": "So many people die thinking they still have time. Don't be one of them.",
+        "flavor": "surface transmission"
     },
-    {
-      "title": "Personal",
-      "rows": [
-        { "label": "Fuel", "value": "Ice cream, boba, grapes, and bananas", "flavor": "atmospheric composition" },
-        { "label": "Languages", "value": "English, Mandarin", "flavor": "signal frequencies detected" },
-        { "label": "Current mission", "value": "Taking care of those around me, sidequesting", "flavor": "orbit subject to change" }
-      ]
-    },
-    {
-      "rows": [
-        { "label": "Population", "value": "1", "flavor": "visitors welcome" }
-      ]
-    }
-  ],
-  "unexplored": [
-    "Loves little chats with strangers",
-    "Lowkey goated at abacus",
-    "Loves cats despite being allergic"
-  ],
-  "motto": { "value": "So many people die thinking they still have time. Don't be one of them.", "flavor": "surface transmission" },
-  "resume": "/Talus_Leong_Resume.png",
-  "moons": [
-    { "name": "Reading", "value": "Sophie's World by Jostein Gaarder", "image": "", "color": "#cfd9ff", "size": 0.085, "radius": 1.5, "speed": 0.42, "tilt": 8 },
-    { "name": "Playing", "value": "Wild Rift", "image": "", "color": "#7ae0ff", "size": 0.1, "radius": 1.8, "speed": 0.3, "tilt": -14 },
-    { "name": "Listening", "value": "Day by Day by T-ara", "image": "", "color": "#ffb36b", "size": 0.08, "radius": 2.08, "speed": 0.22, "tilt": 20 }
-  ]
+    "resume": "/Talus_Leong_Resume.pdf",
+    "moons": [
+        {
+            "name": "Reading",
+            "value": "Sophie's World by Jostein Gaarder",
+            "image": "",
+            "color": "#cfd9ff",
+            "size": 0.085,
+            "radius": 1.5,
+            "speed": 0.42,
+            "tilt": 8
+        },
+        {
+            "name": "Playing",
+            "value": "Wild Rift",
+            "image": "",
+            "color": "#7ae0ff",
+            "size": 0.1,
+            "radius": 1.8,
+            "speed": 0.3,
+            "tilt": -14
+        },
+        {
+            "name": "Listening",
+            "value": "Day by Day by T-ara",
+            "image": "",
+            "color": "#ffb36b",
+            "size": 0.08,
+            "radius": 2.08,
+            "speed": 0.22,
+            "tilt": 20
+        }
+    ]
 }

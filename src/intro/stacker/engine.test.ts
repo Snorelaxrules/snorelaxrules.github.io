@@ -1,5 +1,6 @@
 import { describe, expect, it } from 'vitest'
 import { Bag, Game, WIDTH, pieceCells, seededRandom, spawnPosition } from './engine'
+import type { Rules } from './config'
 import { InputController } from './input'
 import { PIECES, type PieceType } from './pieces'
 
@@ -14,8 +15,8 @@ function setRows(game: Game, rows: string[]) {
 
 const sorted = (cells: [number, number][]) => [...cells].sort((a, b) => a[0] - b[0] || a[1] - b[1])
 
-function gameWith(type: PieceType, rows: string[] = []) {
-  const game = new Game({ random: seededRandom(1) })
+function gameWith(type: PieceType, rows: string[] = [], rules: Partial<Rules> = {}) {
+  const game = new Game({ random: seededRandom(1), rules })
   setRows(game, rows)
   game.active = spawnPosition(type)
   return game
@@ -236,7 +237,7 @@ describe('lock delay and game over', () => {
 })
 
 /** handling the mechanics tests are written against (independent of the tuned defaults) */
-const PRO = { das: 75, arr: 0, dcd: 0, sdf: Infinity }
+const PRO = { das: 75, arr: 0, dcd: 0, sdf: Infinity, carryDas: true, softDropDelay: 0 }
 
 describe('handling', () => {
   it('DAS 75 ms, ARR 0: taps one cell, then slides to the wall once charged', () => {
@@ -290,30 +291,61 @@ describe('handling', () => {
     game.tick(1)
     expect(game.pieceCount).toBe(id + 1)
   })
-  it('held soft drop lands the piece before a held direction slides it (along the floor, not the top)', () => {
-    // a wall on the right near the floor: sliding at the top would clear it, along the floor it can't
-    const game = gameWith('T', ['......#...', '......#...'])
+
+  it('with soft drop held, a held direction drops the piece into the first gap instead of skimming over it', () => {
+    // platform on the right, a 2-wide hole, a block on the left
+    const game = gameWith('O', ['##..######', '##..######', '##..######', '##..######'])
     const input = new InputController(PRO)
     input.press('softDrop', 0, game)
-    input.press('moveRight', 1, game)
-    input.update(200, game)
-    expect(game.grounded).toBe(true)
-    expect(Math.max(...pieceCells(game.active!).map(([x]) => x))).toBe(5)
+    expect(Math.min(...pieceCells(game.active!).map(([, y]) => y))).toBe(4)
+    input.press('moveLeft', 1, game)
+    input.update(100, game)
+    const cells = pieceCells(game.active!)
+    expect(Math.min(...cells.map(([x]) => x))).toBe(2)
+    expect(Math.min(...cells.map(([, y]) => y))).toBe(0)
   })
 
-  it('a grounded piece locks after the short delay while soft drop is held, the full one otherwise', () => {
-    const held = gameWith('T')
-    held.softDrop()
-    const id = held.pieceCount
-    held.tick(99, 1, true)
-    expect(held.pieceCount).toBe(id)
-    held.tick(1, 1, true)
-    expect(held.pieceCount).toBe(id + 1)
+  it('held soft drop waits softDropDelay on each new piece; a fresh press drops at once', () => {
+    const game = gameWith('T')
+    const input = new InputController({ ...PRO, softDropDelay: 120 })
+    input.press('softDrop', 0, game)
+    expect(game.grounded).toBe(true)
+    input.press('hardDrop', 100, game)
+    const id = game.pieceCount
+    input.update(219, game)
+    expect(game.grounded).toBe(false)
+    input.update(220, game)
+    expect(game.grounded).toBe(true)
+    expect(game.pieceCount).toBe(id)
+    // release and press again: immediate
+    input.press('hardDrop', 300, game)
+    input.release('softDrop', 301)
+    input.press('softDrop', 302, game)
+    expect(game.grounded).toBe(true)
+  })
 
-    const free = gameWith('T')
-    free.softDrop()
-    free.tick(100)
-    expect(free.pieceCount).toBe(id)
+  it('without DAS carry, a new piece spawns centred and a held direction re-charges', () => {
+    const game = gameWith('T')
+    const input = new InputController({ ...PRO, carryDas: false })
+    input.press('moveLeft', 0, game)
+    input.update(80, game)
+    input.press('hardDrop', 100, game)
+    const fresh = game.active!
+    expect(fresh.x).toBe(spawnPosition(fresh.type).x)
+    input.update(174, game)
+    expect(game.active!.x).toBe(fresh.x)
+    input.update(175, game)
+    expect(Math.min(...pieceCells(game.active!).map(([x]) => x))).toBe(0)
+  })
+
+  it('a piece that lands by gravity gets the full lock delay', () => {
+    const game = new Game({ random: seededRandom(1) })
+    const id = game.pieceCount
+    while (!game.grounded) game.tick(50)
+    game.tick(499)
+    expect(game.pieceCount).toBe(id)
+    game.tick(1)
+    expect(game.pieceCount).toBe(id + 1)
   })
 })
 

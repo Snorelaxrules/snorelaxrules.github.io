@@ -54,14 +54,20 @@ export const COURSE = {
     G: 1,
     /** main engine (W), units/s², along the nose. Weaker than a black hole up close */
     thrust: 22,
-    /** reverse thrust (S) as a fraction of the main engine */
-    reverse: 0.6,
+    /**
+     * While the engine fires, sideways drift (relative to the nose) decays at
+     * this rate per second, so the ship goes where it points. Coasting is pure
+     * momentum (slingshots, and the trajectory preview, are unaffected). 0 = off.
+     */
+    grip: 3,
+    /** brake (S): speed lost per second, units/s² */
+    brake: 26,
     /** how fast A/D rotate the ship, rad/s */
-    turnRate: 3.6,
-    /** velocity decay per second (near zero: momentum is everything) */
-    drag: 0.02,
+    turnRate: 2.8,
+    /** velocity decay per second (low: momentum still matters, but coasting bleeds speed) */
+    drag: 0.15,
     /** hard speed cap, units/s */
-    maxSpeed: 110,
+    maxSpeed: 55,
     /** ship collision radius */
     shipRadius: 1,
     /** gravity fades to zero between these distances (keeps far wells from dominating) */

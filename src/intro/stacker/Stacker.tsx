@@ -256,7 +256,7 @@ export function Stacker() {
       }
       q.length = 0
       input.update(now, game)
-      game.tick(dt, input.gravityFactor, input.softHeld)
+      game.tick(dt, input.gravityFactor(now))
       // a piece that just spawned inherits the DAS charge / soft drop straight away
       input.update(now, game)
       api.current.paint()

@@ -13,6 +13,16 @@ export const HANDLING = {
   dcd: 0,
   /** Soft Drop Factor: multiplier on gravity while soft dropping. Infinity = straight to the floor (no lock). */
   sdf: Infinity,
+  /**
+   * Carry a held direction's DAS charge into the next piece (TETR.IO does).
+   * Off = a new piece spawns centred and a still-held direction re-charges first.
+   */
+  carryDas: true,
+  /**
+   * With soft drop held, wait this long before soft dropping each new piece,
+   * so there's a moment to move it at the top first. A fresh press drops at once.
+   */
+  softDropDelay: 120,
 }
 
 export type Handling = typeof HANDLING
@@ -23,12 +33,6 @@ export const RULES = {
   timeLimit: 60_000,
   /** how long a grounded piece waits before locking */
   lockDelay: 500,
-  /**
-   * Lock delay while soft drop is held: a soft-dropped piece settles quickly
-   * instead of sliding around on the stack. Let go of soft drop to get the
-   * full delay back (e.g. to set up a spin).
-   */
-  softDropLockDelay: 100,
   /** successful moves/rotations that may reset the lock timer, per piece */
   maxLockResets: 15,
   /**

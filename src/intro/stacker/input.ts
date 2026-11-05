@@ -27,19 +27,21 @@ export class InputController {
   /** auto-shift is paused until this time (DCD) */
   private cutUntil = -Infinity
   private seenPiece = -1
+  /** soft drop applies from this time (held soft drop waits a moment on each new piece) */
+  private softFrom = -Infinity
 
   constructor(handling: Partial<Handling> = {}) {
     this.h = { ...HANDLING, ...handling }
   }
 
-  /** Soft drop is held (Game.tick uses the shorter lock delay). */
-  get softHeld() {
-    return this.soft
+  /** Soft drop is held and applies to the current piece at time `now`. */
+  softActive(now: number) {
+    return this.soft && now >= this.softFrom
   }
 
   /** Gravity multiplier for Game.tick (finite soft drop factors). */
-  get gravityFactor() {
-    return this.soft && Number.isFinite(this.h.sdf) ? this.h.sdf : 1
+  gravityFactor(now: number) {
+    return this.softActive(now) && Number.isFinite(this.h.sdf) ? this.h.sdf : 1
   }
 
   press(action: Action, t: number, game: Game) {
@@ -58,6 +60,7 @@ export class InputController {
       }
       case 'softDrop':
         this.soft = true
+        this.softFrom = t
         break
       case 'hardDrop':
         game.hardDrop()
@@ -103,27 +106,37 @@ export class InputController {
   /** Apply auto-shift and soft drop at time `now`. Safe to call any number of times per frame. */
   update(now: number, game: Game) {
     if (game.pieceCount !== this.seenPiece) {
-      // new piece (spawn or hold): DAS charge carries over; DCD may pause it
-      if (this.seenPiece !== -1) this.cut(now)
+      // new piece (spawn or hold): DCD may pause auto-shift; held keys may not carry over
+      if (this.seenPiece !== -1) {
+        this.cut(now)
+        if (this.soft) this.softFrom = now + this.h.softDropDelay
+        if (!this.h.carryDas && this.dir !== 0) {
+          this.dasStart = now
+          this.repeats = 0
+        }
+      }
       this.seenPiece = game.pieceCount
     }
-    // soft drop finishes first, so a held direction slides the piece along
-    // the floor/stack rather than across the top and then down
-    const instantSoft = this.soft && !Number.isFinite(this.h.sdf)
-    if (instantSoft) game.softDrop()
+    // soft drop takes priority: the piece is always as low as it can go, and
+    // auto-shift drops it after every cell (into the first gap it reaches)
+    const dropping = this.softActive(now) && !Number.isFinite(this.h.sdf)
+    if (dropping) game.softDrop()
     if (this.dir !== 0 && now >= this.cutUntil) {
       const charged = now - this.dasStart - this.h.das
       if (charged >= 0) {
         if (this.h.arr <= 0) {
-          game.slide(this.dir)
+          if (dropping) game.slideDown(this.dir)
+          else game.slide(this.dir)
         } else {
           const due = 1 + Math.floor(charged / this.h.arr)
-          for (; this.repeats < due; this.repeats++) game.moveX(this.dir)
+          for (; this.repeats < due; this.repeats++) {
+            game.moveX(this.dir)
+            if (dropping) game.softDrop()
+          }
         }
       }
     }
-    // ...and again after a slide, in case it moved over a gap
-    if (instantSoft) game.softDrop()
+    if (dropping) game.softDrop()
   }
 
   reset() {
@@ -132,6 +145,7 @@ export class InputController {
     this.repeats = 0
     this.cutUntil = -Infinity
     this.seenPiece = -1
+    this.softFrom = -Infinity
   }
 
   private cut(t: number) {

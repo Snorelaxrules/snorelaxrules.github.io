@@ -71,8 +71,11 @@ function crash(b: Body) {
   if (b.kind === 'planet') course.flash = 1
 }
 
-/** One frame of course simulation. Returns the ship's speed. */
-export function stepCourse(dt: number, ix: number, iy: number, reduced: boolean): number {
+/**
+ * One frame of course simulation. `engine`: W is held (thrust along the nose,
+ * with grip). `brake`: S is held. Returns the ship's speed.
+ */
+export function stepCourse(dt: number, engine: boolean, brake: boolean, reduced: boolean): number {
   const { pos, vel } = ship
   switch (course.status) {
     case 'countdown': {
@@ -136,15 +139,32 @@ export function stepCourse(dt: number, ix: number, iy: number, reduced: boolean)
   // idle (wandering before the gate) or racing
   const steps = Math.max(1, Math.ceil(dt / P.substep))
   const h = dt / steps
+  const fx = Math.cos(ship.heading)
+  const fy = Math.sin(ship.heading)
+  const thrust = engine ? P.thrust : 0
+  const grip = engine ? Math.exp(-P.grip * h) : 1
+  const decay = Math.exp(-P.drag * h)
   for (let i = 0; i < steps; i++) {
     const hit = gravity(pos.x, pos.y, acc)
     if (hit) {
       crash(hit)
       return 0
     }
-    let vx = vel.x + (acc[0] + ix * P.thrust) * h
-    let vy = vel.y + (acc[1] + iy * P.thrust) * h
-    const decay = Math.exp(-P.drag * h)
+    let vx = vel.x + (acc[0] + fx * thrust) * h
+    let vy = vel.y + (acc[1] + fy * thrust) * h
+    if (engine) {
+      // split into along-nose and sideways parts; bleed off the sideways drift
+      const along = vx * fx + vy * fy
+      const side = (vy * fx - vx * fy) * grip
+      vx = along * fx - side * fy
+      vy = along * fy + side * fx
+    }
+    if (brake) {
+      const sp = Math.hypot(vx, vy)
+      const k = sp > 0 ? Math.max(0, sp - P.brake * h) / sp : 0
+      vx *= k
+      vy *= k
+    }
     vx *= decay
     vy *= decay
     ;[vx, vy] = walls(pos.x, pos.y, vx, vy, h)
@@ -193,9 +213,15 @@ export function predictPath(out: Float32Array, points: number, seconds: number):
   let n = 0
   for (let i = 1; i <= steps && n < points; i++) {
     if (gravity(x, y, acc)) break
-    vx += acc[0] * h
-    vy += acc[1] * h
+    const decay = Math.exp(-P.drag * h)
+    vx = (vx + acc[0] * h) * decay
+    vy = (vy + acc[1] * h) * decay
     ;[vx, vy] = walls(x, y, vx, vy, h)
+    const sp = Math.hypot(vx, vy)
+    if (sp > P.maxSpeed) {
+      vx *= P.maxSpeed / sp
+      vy *= P.maxSpeed / sp
+    }
     x += vx * h
     y += vy * h
     if (i % stride === 0) {
