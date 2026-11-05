@@ -260,16 +260,16 @@ export function PlanetScan() {
               </dl>
             </section>
           )}
-        </div>
-        <div className="readout-controls">
-          <a className="scan-btn" href={`mailto:${contact.email}`}>
-            Open comms
-          </a>
-          {content.resume && (
-            <a className="scan-btn" href={content.resume} target="_blank" rel="noreferrer">
-              Resume
+          <div className="readout-controls">
+            <a className="scan-btn" href={`mailto:${contact.email}`}>
+              Open comms
             </a>
-          )}
+            {content.resume && (
+              <a className="scan-btn" href={content.resume} target="_blank" rel="noreferrer">
+                Resume
+              </a>
+            )}
+          </div>
         </div>
         {scanning && <p className="readout-skip">Click to skip</p>}
       </section>

@@ -196,8 +196,18 @@
 
 /* --- readout -------------------------------------------------------------------- */
 
+/*
+ * Side by side, the readout is exactly as tall as the planet stage: it adds no
+ * height to the row (height 0) and stretches to fill it (min-height 100%).
+ * The header stays put; everything below it (buttons included) scrolls.
+ */
 .readout {
   position: relative;
+  display: flex;
+  flex-direction: column;
+  align-self: stretch;
+  height: 0;
+  min-height: 100%;
   overflow: hidden;
   border: 1px solid var(--line);
   border-radius: 16px;
@@ -213,6 +223,7 @@
 }
 
 .readout-head {
+  flex: none;
   display: flex;
   justify-content: space-between;
   gap: 12px;
@@ -234,7 +245,37 @@
 }
 
 .readout-body {
+  flex: 1;
+  min-height: 0;
+  overflow-y: auto;
+  overscroll-behavior: contain;
   padding: 4px 20px 0;
+  scrollbar-width: thin;
+  scrollbar-color: rgb(122 224 255 / 0.3) transparent;
+  /* fade the bottom edge so it reads as scrollable */
+  mask-image: linear-gradient(to bottom, #000 calc(100% - 28px), transparent);
+}
+
+.readout-body::-webkit-scrollbar {
+  width: 6px;
+}
+
+.readout-body::-webkit-scrollbar-thumb {
+  border-radius: 3px;
+  background: rgb(122 224 255 / 0.3);
+}
+
+/* stacked (narrow screens): the readout sits below the stage at its natural height */
+@media (max-width: 900px) {
+  .readout {
+    height: auto;
+    min-height: 0;
+  }
+
+  .readout-body {
+    overflow: visible;
+    mask-image: none;
+  }
 }
 
 /* sections separated by subtle dividers */
@@ -347,8 +388,9 @@
 
 .readout-controls {
   display: flex;
+  flex-wrap: wrap;
   gap: 10px;
-  padding: 16px 20px 20px;
+  padding: 4px 0 28px;
 }
 
 /* bracketed console-style buttons */
