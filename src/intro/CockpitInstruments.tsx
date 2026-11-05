@@ -2,10 +2,38 @@ import type { CSSProperties, KeyboardEvent } from 'react'
 import { site } from '../content/site'
 import { useIntro } from '../state/introStore'
 import { ASPECT, VIEWBOX, cockpitConfig } from './cockpit.config'
+import { CHARGE_SEGMENTS, useCharge } from './stacker/charge'
 
 const BARS = [0, 1, 2, 3, 4, 5, 6]
 const SLOT_LIGHTS = [0, 1, 2, 3, 4, 5]
 const PANEL_LIGHTS = [0, 1, 2, 3, 4, 5, 6, 7, 8]
+
+/** Decorative FTL charge on the right side panel: each line cleared in Cargo Loader lights a segment. */
+function ChargeMeter() {
+  const lines = useCharge((s) => s.lines)
+  const lit = Math.min(lines, CHARGE_SEGMENTS)
+  const full = lit === CHARGE_SEGMENTS
+  return (
+    <g className={`charge${full ? ' is-full' : ''}`}>
+      <text x="1450" y="734" textAnchor="middle" className="ci-label charge-label" fill="var(--accent)" fillOpacity="0.5">
+        CHARGE
+      </text>
+      {Array.from({ length: CHARGE_SEGMENTS }, (_, i) => (
+        <rect
+          key={i}
+          x={1408 + (i % 2) * 44}
+          y={800 - Math.floor(i / 2) * 13}
+          width="40"
+          height="8"
+          rx="2"
+          fill={i < lit ? 'var(--accent-warm)' : 'var(--accent)'}
+          fillOpacity={i < lit ? 0.95 : 0.1}
+          className="charge-seg"
+        />
+      ))}
+    </g>
+  )
+}
 
 /** Animated readouts plus the start lever, in the same coordinate space as the frame. */
 export function CockpitInstruments() {
@@ -86,21 +114,26 @@ export function CockpitInstruments() {
             ))}
           </g>
 
-          {/* right console: system readouts */}
-          <g className="ci-mono" fill="var(--accent)">
-            <text x="1036" y="700" className="ci-label" fillOpacity="0.5">SYSTEMS</text>
-            <text x="1040" y="736" fillOpacity="0.6">FTL CORE</text>
-            <text x="1330" y="736" textAnchor="end">{engaged ? '100%' : '98%'}</text>
-            <text x="1040" y="768" fillOpacity="0.6">NAV</text>
-            <text x="1330" y="768" textAnchor="end">{engaged ? 'ENGAGED' : 'LOCKED'}</text>
-            <text x="1040" y="800" fillOpacity="0.6">HULL</text>
-            <text x="1330" y="800" textAnchor="end">NOMINAL</text>
-          </g>
-          <rect x="1040" y="818" width="290" height="6" rx="3" fill="var(--accent)" fillOpacity="0.12" />
-          <rect x="1040" y="818" width={engaged ? 290 : 284} height="6" rx="3" fill="var(--accent-warm)" className="core-fill" />
+          {/* right console: system readouts (the game screen takes this spot when enabled) */}
+          {!cockpitConfig.game && (
+            <>
+              <g className="ci-mono" fill="var(--accent)">
+                <text x="1036" y="700" className="ci-label" fillOpacity="0.5">SYSTEMS</text>
+                <text x="1040" y="736" fillOpacity="0.6">FTL CORE</text>
+                <text x="1330" y="736" textAnchor="end">{engaged ? '100%' : '98%'}</text>
+                <text x="1040" y="768" fillOpacity="0.6">NAV</text>
+                <text x="1330" y="768" textAnchor="end">{engaged ? 'ENGAGED' : 'LOCKED'}</text>
+                <text x="1040" y="800" fillOpacity="0.6">HULL</text>
+                <text x="1330" y="800" textAnchor="end">NOMINAL</text>
+              </g>
+              <rect x="1040" y="818" width="290" height="6" rx="3" fill="var(--accent)" fillOpacity="0.12" />
+              <rect x="1040" y="818" width={engaged ? 290 : 284} height="6" rx="3" fill="var(--accent-warm)" className="core-fill" />
+            </>
+          )}
 
           {/* side panels */}
-          {[110, 1410].map((x0) =>
+          {cockpitConfig.game && <ChargeMeter />}
+          {(cockpitConfig.game ? [110] : [110, 1410]).map((x0) =>
             PANEL_LIGHTS.map((i) => (
               <circle
                 key={`${x0}-${i}`}

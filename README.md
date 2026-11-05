@@ -14,6 +14,7 @@ npm run dev       # http://localhost:5173
 npm run build     # type-check + production build into dist/
 npm run preview   # serve the production build
 npm run lint
+npm test          # unit tests (Vitest): game rules, kicks, handling
 ```
 
 Every push to `main` builds and deploys via `.github/workflows/deploy.yml`.
@@ -178,7 +179,49 @@ Append to `content/places.json`:
 - **Colours and fonts:** `src/styles/tokens.css`.
 - **The ship:** `src/scene/ship/shipConfig.ts` holds speed, acceleration, drag, banking, bounds, proximity radius, camera follow and lag, trail, and drag-to-pan limits, and hint timing. The look is in `ShipModel.tsx`; replace its contents to use a model or sprite, keeping the nose along +x and the engine at `ENGINE_OFFSET`.
 - **Black hole:** `SHIP.blackHole` in the same file holds the gravity strength (`mu`), softening, influence radius, event horizon, how long the ship stays swallowed, and how hard it's spat out. It lands somewhere random on each visit; add `?bh=x,y` to the URL to pin it while tuning (e.g. `/?bh=11,-25` puts it right next to the spawn point).
+- **Dashboard game (Cargo Loader):** see below.
 - **Cockpit art:** `src/intro/cockpit.config.ts`. Set `frameImage` to a 16:9 PNG with transparent windows to replace the SVG frame. The instruments and lever share the same 1600×900 coordinate space, so they stay aligned.
+
+## Cargo Loader (the dashboard game)
+
+A falling-block game on the cockpit's right console, playable on the start
+screen. Click the screen to play. Esc or clicking elsewhere pauses it, and
+pulling the hyperdrive lever fades it out. It's hidden on touch devices and
+very small windows.
+
+| Key | Action |
+| --- | --- |
+| ← / → | Move |
+| ↓ | Soft drop (straight to the floor, doesn't lock) |
+| Space | Hard drop |
+| ↑ or X | Rotate clockwise |
+| Z | Rotate counterclockwise |
+| A | Rotate 180° |
+| Shift or C | Hold |
+| R | Restart |
+| Esc | Pause (a second Esc skips the intro) |
+
+Everything tunable is in `src/intro/stacker/config.ts`:
+
+- **Handling** (`HANDLING`): `das` (75 ms), `arr` (0 = instant to the wall),
+  `dcd` (0), `sdf` (`Infinity` = instant soft drop). All in milliseconds of real
+  time, so it plays the same at 60, 120, or 144 Hz.
+- **Keybinds** (`KEYS`): each action maps to a list of `KeyboardEvent.code`
+  values (physical keys, e.g. `'KeyX'`, `'ArrowUp'`, `'ShiftLeft'`). Add or
+  replace codes; a code should appear under only one action.
+- **Rules** (`RULES`): lock delay (500 ms), lock resets (15), lines per level
+  (10), gravity cap (cells/s), and next-queue length.
+- **Colours** (`THEME`).
+
+Rules follow modern guideline play: 7-bag, hold, ghost, SRS+ with TETR.IO's
+kick tables (including 180° and the symmetric I kicks), no ARE or line-clear
+delay. Each cleared line lights a segment of the decorative CHARGE meter on the
+right side panel. Set `game: false` in `src/intro/cockpit.config.ts` to remove
+the screen; the SYSTEMS readout returns in its place.
+
+Code: `engine.ts` (pure game logic), `pieces.ts` (shapes, kick tables),
+`input.ts` (DAS/ARR from key timestamps), `render.ts` (canvas), `Stacker.tsx`
+(focus, key listeners, loop), and `engine.test.ts`.
 
 ## How it fits together
 

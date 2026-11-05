@@ -265,3 +265,15 @@
     animation: none !important;
   }
 }
+
+/* --- FTL charge (fed by Cargo Loader line clears) ------------------------ */
+
+.charge-seg {
+  transition:
+    fill 0.3s,
+    fill-opacity 0.3s;
+}
+
+.charge.is-full .charge-seg {
+  animation: hud-pulse 1.6s ease-in-out infinite;
+}

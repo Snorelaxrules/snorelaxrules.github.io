@@ -8,11 +8,14 @@
  * The image is scaled like the SVG (cover, anchored bottom-center), so the
  * instruments overlay — which uses the same 1600×900 coordinate space — stays aligned.
  * Set `instruments: false` if your art already includes screens/readouts; the
- * start lever always renders.
+ * start lever always renders. `game` mounts the Cargo Loader screen on the
+ * right console (x 1020–1350, y 598–876 in the same space); with it off, the
+ * SYSTEMS readout returns there.
  */
-export const cockpitConfig: { frameImage: string | null; instruments: boolean } = {
+export const cockpitConfig: { frameImage: string | null; instruments: boolean; game: boolean } = {
   frameImage: null,
   instruments: true,
+  game: true,
 }
 
 /** Shared coordinate space for frame art and instruments. */

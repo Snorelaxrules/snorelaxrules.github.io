@@ -1,29 +1,35 @@
 {
-  "$comment": "About → Dossier. photo and resume are paths under /public (or full URLs); leave photo empty for the placeholder. The email button uses content/contact.json.",
-  "name": "Talus Leong",
-  "fileId": "TL-0001",
-  "clearance": "Level 3",
-  "photo": "",
-  "resume": "/resume.pdf",
-  "fields": [
-    { "label": "Class", "value": "Sophomore, Cornell University" },
-    { "label": "Home port", "value": "Cupertino, California" },
-    { "label": "Current base", "value": "Ithaca, NY" },
-    { "label": "Major", "value": "Computer Science" },
-    { "label": "Minors", "value": "AI, Business" },
-    { "label": "Languages", "value": "[Placeholder: languages you speak]" },
-    { "label": "Current mission", "value": "[Placeholder: what you're working toward right now]" },
-    { "label": "Fuel", "value": "[Placeholder: e.g. coffee, boba, late-night ramen]" }
-  ],
-  "now": {
-    "reading": "[Placeholder: book]",
-    "playing": "[Placeholder: game]",
-    "listening": "[Placeholder: album or artist]"
-  },
-  "motto": "[Placeholder: your motto]",
-  "redacted": [
-    "[Placeholder: a fun fact, revealed on hover]",
-    "[Placeholder: a surprising skill]",
-    "[Placeholder: a secret favorite thing]"
-  ]
+    "$comment": "About → Dossier. photo and resume are paths under /public (or full URLs); leave photo empty for the placeholder. The email button uses content/contact.json.",
+    "name": "Talus Leong",
+    "fileId": "TL-0001",
+    "clearance": "Level 3",
+    "photo": "",
+    "resume": "/resume.pdf",
+    "fields": [
+        { "label": "Class", "value": "Sophomore, Cornell University" },
+        { "label": "Home port", "value": "Cupertino, California" },
+        {
+            "label": "Current base, escaping containment in 3.5 years",
+            "value": "Ithaca, NY"
+        },
+        { "label": "Major", "value": "Computer Science" },
+        { "label": "Minors", "value": "AI, Business" },
+        { "label": "Languages", "value": "English, Mandarin" },
+        {
+            "label": "Current mission",
+            "value": "Taking care of those around me, sidequesting"
+        },
+        { "label": "Fuel", "value": "Ice cream, boba, grapes, and bananas" }
+    ],
+    "now": {
+        "reading": "Sophie's World by Jostein Gaarder",
+        "playing": "Wild Rift",
+        "listening": "Day by Day by T-ara"
+    },
+    "motto": "So many people die thinking they still have time. Don't be one of them.",
+    "redacted": [
+        "Loves little chats with strangers",
+        "Lowkey goated at abacus",
+        "Loves cats despite being allergic"
+    ]
 }

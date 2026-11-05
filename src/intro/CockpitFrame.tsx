@@ -109,7 +109,12 @@ export function CockpitFrame() {
 
       <g fill="#060a15" stroke="var(--accent)" strokeOpacity="0.14">
         <rect x="250" y="676" width="330" height="168" rx="14" />
-        <rect x="1020" y="676" width="330" height="168" rx="14" />
+        {cockpitConfig.game ? (
+          // housing for the game screen, standing slightly proud of the dash
+          <rect x="1010" y="589" width="350" height="296" rx="20" />
+        ) : (
+          <rect x="1020" y="676" width="330" height="168" rx="14" />
+        )}
         <rect x="690" y="626" width="220" height="250" rx="18" />
         <rect x="90" y="712" width="120" height="110" rx="10" />
         <rect x="1390" y="712" width="120" height="110" rx="10" />

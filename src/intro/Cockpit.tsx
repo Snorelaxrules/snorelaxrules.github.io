@@ -1,8 +1,10 @@
 import { useEffect, useRef } from 'react'
 import { damp, pointer, prefersReducedMotion } from '../scene/pointer'
 import { useIntro } from '../state/introStore'
+import { cockpitConfig } from './cockpit.config'
 import { CockpitFrame } from './CockpitFrame'
 import { CockpitInstruments } from './CockpitInstruments'
+import { Stacker } from './stacker/Stacker'
 import { IDLE_SAMPLE, jitter, sampleJump } from './timeline'
 
 /** How far the cockpit shifts against the pointer (px) — the stars stay put, which reads as depth. */
@@ -42,6 +44,7 @@ export function Cockpit() {
     <div ref={rootRef} className={`cockpit${jumping ? ' is-jumping' : ''}`}>
       <CockpitFrame />
       <CockpitInstruments />
+      {cockpitConfig.game && <Stacker />}
     </div>
   )
 }
