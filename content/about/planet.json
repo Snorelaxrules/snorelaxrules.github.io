@@ -1,5 +1,5 @@
 {
-    "$comment": "About → Planet Scan. planet: look of the 3D planet (colors are hex; seed reshapes the continents; seaLevel 0–1 sets how much is ocean). readout: sections shown in order; each row is { label, value, flavor? } where value is the plain fact and flavor is an optional short planet-joke line (~8 words max). A section may have strip: a list of names drawn as equal decorative segments (never proportions). unexplored: hover-to-reveal redacted lines under 'Classified'. motto: { value, flavor? }. moons: add or remove freely; radius is orbit size in planet radii (keep 1.4–2.1), speed is radians/second, tilt is the orbit's incline in degrees, image is optional.",
+    "$comment": "About → Planet Scan. planet: look of the 3D planet (colors are hex; seed reshapes the continents; seaLevel 0–1 sets how much is ocean). readout: sections shown in order; each row is { label, value, flavor? } where value is the plain fact and flavor is an optional short planet-joke line (~8 words max). A section may have strip: a list of names drawn as equal decorative segments (never proportions). unexplored: hover-to-reveal redacted lines under 'Classified'. motto: { value, flavor? }. moons: add or remove freely; radius is orbit size in planet radii (keep 1.4–2.1), speed is radians/second, tilt is the orbit's incline in degrees, image is optional, icon is an optional glyph by the moon (book, game, spotify, music, film).",
     "planet": {
         "seed": 7.3,
         "seaLevel": 0.53,
@@ -104,6 +104,7 @@
             "name": "Reading",
             "value": "Sophie's World by Jostein Gaarder",
             "image": "",
+            "icon": "book",
             "color": "#cfd9ff",
             "size": 0.085,
             "radius": 1.5,
@@ -114,6 +115,7 @@
             "name": "Playing",
             "value": "Wild Rift",
             "image": "",
+            "icon": "game",
             "color": "#7ae0ff",
             "size": 0.1,
             "radius": 1.8,
@@ -124,6 +126,7 @@
             "name": "Listening",
             "value": "Day by Day by T-ara",
             "image": "",
+            "icon": "spotify",
             "color": "#ffb36b",
             "size": 0.08,
             "radius": 2.08,

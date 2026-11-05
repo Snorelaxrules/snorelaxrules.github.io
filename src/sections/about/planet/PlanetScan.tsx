@@ -4,6 +4,7 @@ import { type ReadoutRow, planetScan } from '../../../content/aboutContent'
 import { contact } from '../../../content/data'
 import { prefersReducedMotion } from '../../../scene/pointer'
 import { Photo } from '../Photo'
+import { MoonIcon } from './MoonIcon'
 import { PlanetStage, type SpinControl } from './PlanetStage'
 import './planet.css'
 
@@ -208,7 +209,10 @@ export function PlanetScan() {
               <button type="button" className="moon-card-close" onClick={() => setSelectedMoon(null)} aria-label="Close">
                 ×
               </button>
-              <p className="moon-card-kicker">Moon · {moon.name}</p>
+              <p className="moon-card-kicker">
+                <MoonIcon name={moon.icon} />
+                Moon · {moon.name}
+              </p>
               {moon.image && <Photo key={moon.image} src={moon.image} alt={moon.name} seed={moon.name} className="moon-card-photo" />}
               <p className="moon-card-value">{moon.value}</p>
             </motion.div>

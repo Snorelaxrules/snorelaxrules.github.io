@@ -99,6 +99,8 @@ export interface Moon {
   name: string
   value: string
   image: string
+  /** small glyph by the moon: book, game, spotify, music, film (see MoonIcon) */
+  icon?: string
   color: string
   size: number
   radius: number

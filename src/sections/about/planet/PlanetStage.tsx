@@ -1,6 +1,5 @@
-import { Html } from '@react-three/drei'
 import { Canvas, useFrame, useThree } from '@react-three/fiber'
-import { type RefObject, useEffect, useMemo, useRef } from 'react'
+import { type MutableRefObject, type RefObject, useEffect, useMemo, useRef } from 'react'
 import {
   AdditiveBlending,
   BackSide,
@@ -13,6 +12,7 @@ import {
 } from 'three'
 import { type Moon, type PlanetLook, planetScan } from '../../../content/aboutContent'
 import { damp, prefersReducedMotion } from '../../../scene/pointer'
+import { MoonIcon } from './MoonIcon'
 import { atmosphereFragment, cloudFragment, sphereVertex, surfaceFragment } from './shaders'
 
 const DEG = Math.PI / 180
@@ -153,34 +153,43 @@ interface MoonProps {
   index: number
   active: boolean
   selected: boolean
-  onActive: (i: number | null) => void
-  onSelect: (i: number) => void
+  /** the moon's DOM button (rendered over the canvas by PlanetStage) */
+  buttons: MutableRefObject<(HTMLButtonElement | null)[]>
 }
 
-function MoonBody({ moon, index, active, selected, onActive, onSelect }: MoonProps) {
+/**
+ * One moon and its orbit. Its button is plain DOM over the canvas, placed here
+ * every frame by projecting the moon to the screen (drei's <Html> left the
+ * first moon's button empty).
+ */
+function MoonBody({ moon, index, active, selected, buttons }: MoonProps) {
   const ref = useRef<Group>(null)
-  const buttonRef = useRef<HTMLButtonElement>(null)
   const angle = useRef(index * 2.1)
-  const tmp = useMemo(() => ({ world: new Vector3(), dir: new Vector3() }), [])
+  const tmp = useMemo(() => ({ world: new Vector3(), dir: new Vector3(), screen: new Vector3() }), [])
   const paused = active || selected
 
-  useFrame(({ camera }, delta) => {
+  useFrame(({ camera, size }, delta) => {
     const g = ref.current
     if (!g) return
     if (!paused) angle.current += moon.speed * Math.min(delta, 0.05) * (prefersReducedMotion() ? 0.3 : 1)
     g.position.set(Math.cos(angle.current) * moon.radius, 0, Math.sin(angle.current) * moon.radius)
-    // hide the button while the moon is behind the planet
-    const btn = buttonRef.current
-    if (btn) {
-      // behind = on the far side of the planet and within its silhouette (radius 1)
-      const w = g.getWorldPosition(tmp.world)
-      const d = tmp.dir.copy(camera.position).normalize()
-      const along = w.dot(d)
-      const offAxis = Math.sqrt(Math.max(0, w.lengthSq() - along * along))
-      const behind = along < 0 && offAxis < 1.05
-      btn.dataset.hidden = behind ? 'true' : 'false'
-      btn.tabIndex = behind ? -1 : 0
-    }
+    const btn = buttons.current[index]
+    if (!btn) return
+    const w = g.getWorldPosition(tmp.world)
+    // hide the button while the moon is behind the planet:
+    // on the far side of it and within its silhouette (radius 1)
+    const d = tmp.dir.copy(camera.position).normalize()
+    const along = w.dot(d)
+    const offAxis = Math.sqrt(Math.max(0, w.lengthSq() - along * along))
+    const behind = along < 0 && offAxis < 1.05
+    btn.dataset.hidden = behind ? 'true' : 'false'
+    btn.tabIndex = behind ? -1 : 0
+    const p = tmp.screen.copy(w).project(camera)
+    const x = (p.x * 0.5 + 0.5) * size.width
+    const y = (-p.y * 0.5 + 0.5) * size.height
+    btn.style.transform = `translate3d(${x.toFixed(1)}px, ${y.toFixed(1)}px, 0) translate(-50%, -50%)`
+    // nearer moons stack above farther ones
+    btn.style.zIndex = String(Math.round(10 + along * 3))
   })
 
   const highlight = active || selected
@@ -192,23 +201,6 @@ function MoonBody({ moon, index, active, selected, onActive, onSelect }: MoonPro
           <sphereGeometry args={[1, 24, 16]} />
           <meshStandardMaterial color={moon.color} emissive={moon.color} emissiveIntensity={highlight ? 0.7 : 0.18} roughness={0.85} />
         </mesh>
-        <Html center zIndexRange={[20, 0]}>
-          <button
-            ref={buttonRef}
-            type="button"
-            className={`moon-btn${highlight ? ' is-active' : ''}`}
-            aria-label={`Moon ${moon.name}: ${moon.value}`}
-            aria-expanded={selected}
-            data-moon-control=""
-            onPointerEnter={() => onActive(index)}
-            onPointerLeave={() => onActive(null)}
-            onFocus={() => onActive(index)}
-            onBlur={() => onActive(null)}
-            onClick={() => onSelect(index)}
-          >
-            <span className="moon-label">{moon.name}</span>
-          </button>
-        </Html>
       </group>
     </group>
   )
@@ -230,32 +222,64 @@ export interface PlanetStageProps {
   onSelectMoon: (i: number) => void
 }
 
-/** The planet's own small canvas. Mounted only while the Planet Scan tab is open. */
+/** The planet's own small canvas, plus the moon buttons over it. Mounted only while the Planet Scan tab is open. */
 export function PlanetStage({ spinRef, activeMoon, selectedMoon, onActiveMoon, onSelectMoon }: PlanetStageProps) {
+  const buttons = useRef<(HTMLButtonElement | null)[]>([])
   return (
-    <Canvas
-      flat
-      dpr={[1, 1.5]}
-      gl={{ antialias: true, powerPreference: 'high-performance', alpha: true }}
-      camera={{ fov: 34, position: [0, 0, 7.4], near: 0.1, far: 50 }}
-    >
-      <CameraSetup />
-      <ambientLight intensity={0.25} />
-      <directionalLight position={LIGHT.clone().multiplyScalar(10)} intensity={2.2} />
-      <group rotation={[SYSTEM_TILT, 0, 0]}>
-        <Planet spinRef={spinRef} />
-        {planetScan.moons.map((m, i) => (
-          <MoonBody
-            key={m.name}
-            moon={m}
-            index={i}
-            active={activeMoon === i}
-            selected={selectedMoon === i}
-            onActive={onActiveMoon}
-            onSelect={onSelectMoon}
-          />
-        ))}
-      </group>
-    </Canvas>
+    <>
+      <Canvas
+        flat
+        dpr={[1, 1.5]}
+        gl={{ antialias: true, powerPreference: 'high-performance', alpha: true }}
+        camera={{ fov: 34, position: [0, 0, 7.4], near: 0.1, far: 50 }}
+      >
+        <CameraSetup />
+        <ambientLight intensity={0.25} />
+        <directionalLight position={LIGHT.clone().multiplyScalar(10)} intensity={2.2} />
+        <group rotation={[SYSTEM_TILT, 0, 0]}>
+          <Planet spinRef={spinRef} />
+          {planetScan.moons.map((m, i) => (
+            <MoonBody
+              key={m.name}
+              moon={m}
+              index={i}
+              active={activeMoon === i}
+              selected={selectedMoon === i}
+              buttons={buttons}
+            />
+          ))}
+        </group>
+      </Canvas>
+      <div className="moon-layer">
+        {planetScan.moons.map((m, i) => {
+          const highlight = activeMoon === i || selectedMoon === i
+          return (
+            <button
+              key={m.name}
+              ref={(el) => {
+                buttons.current[i] = el
+              }}
+              type="button"
+              className={`moon-btn${highlight ? ' is-active' : ''}`}
+              aria-label={`Moon ${m.name}: ${m.value}`}
+              aria-expanded={selectedMoon === i}
+              data-moon-control=""
+              onPointerEnter={() => onActiveMoon(i)}
+              onPointerLeave={() => onActiveMoon(null)}
+              onFocus={() => onActiveMoon(i)}
+              onBlur={() => onActiveMoon(null)}
+              onClick={() => onSelectMoon(i)}
+            >
+              {m.icon && (
+                <span className="moon-icon">
+                  <MoonIcon name={m.icon} />
+                </span>
+              )}
+              <span className="moon-label">{m.name}</span>
+            </button>
+          )
+        })}
+      </div>
+    </>
   )
 }

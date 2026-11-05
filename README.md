@@ -97,12 +97,13 @@ placeholder.
 - `moons` can be added or removed freely:
 
   ```json
-  { "name": "Watching", "value": "[a show]", "image": "", "color": "#9db4ff", "size": 0.09, "radius": 1.65, "speed": 0.35, "tilt": -6 }
+  { "name": "Watching", "value": "[a show]", "image": "", "icon": "film", "color": "#9db4ff", "size": 0.09, "radius": 1.65, "speed": 0.35, "tilt": -6 }
   ```
 
   `radius` is the orbit in planet radii (keep it between about 1.4 and 2.1 so it
   stays in frame). `speed` is in radians per second, `tilt` is the orbit's
-  incline in degrees, and `image` is optional.
+  incline in degrees, `image` is optional, and `icon` is an optional glyph shown
+  beside the moon: `book`, `game`, `spotify`, `music` or `film`.
 
 The scan animation plays once per session. The old ID-card Dossier is still in
 `src/sections/about/Dossier.tsx` with `content/about/dossier.json`; uncomment its
