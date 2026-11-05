@@ -22,9 +22,9 @@
       "title": "Identity",
       "rows": [
         { "label": "Name", "value": "Talus Leong", "flavor": "catalogued locally as Planet Talus" },
-        { "label": "Year & school", "value": "Sophomore at Cornell University", "flavor": "still cooling, very tectonically active" },
+        { "label": "Year & school", "value": "Sophomore, Cornell University", "flavor": "still cooling, very tectonically active" },
         { "label": "From", "value": "Cupertino, California", "flavor": "home star, origin of all early light" },
-        { "label": "Based in", "value": "Ithaca, NY", "flavor": "stable orbit, seasonal snowfall" }
+        { "label": "Based in", "value": "Ithaca, NY", "flavor": "escaping containment in 3.5 years" }
       ]
     },
     {
@@ -38,9 +38,9 @@
     {
       "title": "Personal",
       "rows": [
-        { "label": "Fuel", "value": "[Placeholder: e.g. boba, coffee, late-night ramen]", "flavor": "atmospheric composition" },
-        { "label": "Languages", "value": "[Placeholder: languages you speak]", "flavor": "signal frequencies detected" },
-        { "label": "Currently working on", "value": "[Placeholder: what you're working on]", "flavor": "active missions" }
+        { "label": "Fuel", "value": "Ice cream, boba, grapes, and bananas", "flavor": "atmospheric composition" },
+        { "label": "Languages", "value": "English, Mandarin", "flavor": "signal frequencies detected" },
+        { "label": "Current mission", "value": "Taking care of those around me, sidequesting", "flavor": "orbit subject to change" }
       ]
     },
     {
@@ -50,15 +50,15 @@
     }
   ],
   "unexplored": [
-    "[Placeholder: a fun fact, revealed on hover]",
-    "[Placeholder: a surprising skill]",
-    "[Placeholder: a secret favorite thing]"
+    "Loves little chats with strangers",
+    "Lowkey goated at abacus",
+    "Loves cats despite being allergic"
   ],
-  "motto": { "value": "[Placeholder: your motto]", "flavor": "surface transmission" },
+  "motto": { "value": "So many people die thinking they still have time. Don't be one of them.", "flavor": "surface transmission" },
   "resume": "/resume.pdf",
   "moons": [
-    { "name": "Reading", "value": "[Placeholder: book]", "image": "", "color": "#cfd9ff", "size": 0.085, "radius": 1.5, "speed": 0.42, "tilt": 8 },
-    { "name": "Playing", "value": "[Placeholder: game]", "image": "", "color": "#7ae0ff", "size": 0.1, "radius": 1.8, "speed": 0.3, "tilt": -14 },
-    { "name": "Listening", "value": "[Placeholder: album or artist]", "image": "", "color": "#ffb36b", "size": 0.08, "radius": 2.08, "speed": 0.22, "tilt": 20 }
+    { "name": "Reading", "value": "Sophie's World by Jostein Gaarder", "image": "", "color": "#cfd9ff", "size": 0.085, "radius": 1.5, "speed": 0.42, "tilt": 8 },
+    { "name": "Playing", "value": "Wild Rift", "image": "", "color": "#7ae0ff", "size": 0.1, "radius": 1.8, "speed": 0.3, "tilt": -14 },
+    { "name": "Listening", "value": "Day by Day by T-ara", "image": "", "color": "#ffb36b", "size": 0.08, "radius": 2.08, "speed": 0.22, "tilt": 20 }
   ]
 }
