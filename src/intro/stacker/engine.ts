@@ -264,12 +264,12 @@ export class Game {
     return Math.min(...pieceCells(p).map(([, y]) => y))
   }
 
-  /** New lowest row: fresh lock timer and reset budget. */
+  /** New lowest row: fresh lock timer (and reset budget, if configured). */
   private refreshLowest() {
     const b = this.bottom(this.active as Piece)
     if (b >= this.lowest) return false
     this.lowest = b
-    this.lockResets = 0
+    if (this.rules.refillResetsOnNewLow) this.lockResets = 0
     this.lockTimer = 0
     this.touched = false
     return true

@@ -209,6 +209,23 @@ describe('lock delay and game over', () => {
     expect(game.over).toBe(true)
   })
 
+  it('sliding down a staircase does not refill the reset budget', () => {
+    // descending steps to the right: each move right drops the piece a row
+    const game = gameWith('O', ['..........', '##........', '####......', '######....', '########..'])
+    game.active = { type: 'O', rot: 0, x: 0, y: 6 }
+    game.softDrop()
+    const id = game.pieceCount
+    let moves = 0
+    for (let i = 0; i < 40 && game.pieceCount === id; i++) {
+      game.tick(1)
+      if (game.pieceCount !== id) break
+      if (game.moveX(i % 2 ? -1 : 1)) moves++
+      game.softDrop()
+    }
+    expect(game.pieceCount).toBe(id + 1)
+    expect(moves).toBeLessThanOrEqual(15)
+  })
+
   it('block out: no room at the spawn point ends the game', () => {
     const game = gameWith('T')
     for (const y of [20, 21]) for (let x = 3; x < 7; x++) game.set(x, y, 8)

@@ -21,8 +21,14 @@ export type Handling = typeof HANDLING
 export const RULES = {
   /** how long a grounded piece waits before locking */
   lockDelay: 500,
-  /** successful moves/rotations that may reset the lock timer per piece (refreshed on reaching a new lowest row) */
+  /** successful moves/rotations that may reset the lock timer, per piece */
   maxLockResets: 15,
+  /**
+   * Refill the reset budget whenever the piece reaches a new lowest row (classic
+   * "extended placement"). Off = 15 resets per piece in total, so a piece
+   * can't be slid down the stack indefinitely. A new low always restarts the timer.
+   */
+  refillResetsOnNewLow: false,
   linesPerLevel: 10,
   /** gravity cap in cells per second */
   maxGravity: 20,
