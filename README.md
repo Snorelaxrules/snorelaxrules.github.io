@@ -42,9 +42,10 @@ All text lives in `/content`. Edit it, commit, push. No component changes needed
 | `content/projects.json` | Lab cards |
 | `content/contact.json` | Email, intro text, social links |
 | `content/clusters.json` | The galaxy map itself (see below) |
+| `content/secret.json` | The "Secret transmission" shown after finishing the hidden course |
 
 Static files (photo, résumé PDF, images used in posts) go in `/public` and are
-referenced from the site root, e.g. `public/resume.pdf` → `/resume.pdf`.
+referenced from the site root, e.g. `public/Talus_Leong_Resume.png` → `/Talus_Leong_Resume.png`.
 
 ### Add a post
 
@@ -178,9 +179,45 @@ Append to `content/places.json`:
 - **Camera (home view, flight times, drift, parallax):** `src/scene/rig.ts`.
 - **Colours and fonts:** `src/styles/tokens.css`.
 - **The ship:** `src/scene/ship/shipConfig.ts` holds speed, acceleration, drag, banking, bounds, proximity radius, camera follow and lag, trail, and drag-to-pan limits, and hint timing. The look is in `ShipModel.tsx`; replace its contents to use a model or sprite, keeping the nose along +x and the engine at `ENGINE_OFFSET`.
+- **Hidden course:** see "The gravitational anomaly" below.
 - **Black hole:** `SHIP.blackHole` in the same file holds the gravity strength (`mu`), softening, influence radius, event horizon, how long the ship stays swallowed, and how hard it's spat out. It lands somewhere random on each visit; add `?bh=x,y` to the URL to pin it while tuning (e.g. `/?bh=11,-25` puts it right next to the spawn point).
 - **Dashboard game (Cargo Loader):** see below.
 - **Cockpit art:** `src/intro/cockpit.config.ts`. Set `frameImage` to a 16:9 PNG with transparent windows to replace the SVG frame. The instruments and lever share the same 1600×900 coordinate space, so they stay aligned.
+
+## The gravitational anomaly (hidden course)
+
+Fly off the right edge of the galaxy map. A warm glow on the right horizon and
+a "Gravitational anomaly" sign point the way. Fly through the START gate to get
+a 3-2-1 countdown, then pass the six rings in order (the next one pulses amber,
+passed ones turn green), slingshotting around three black holes and five
+planets, and dive into the wormhole. That opens the Secret transmission.
+Touching a planet or crossing an event horizon respawns you at the last ring.
+Inside the course the controls are ship-relative: A/D turn, W thrusts along the
+nose, S fires a weaker reverse thrust. R respawns, T toggles the dotted trajectory
+preview, Esc leaves. Best time and a "found it" star near the entrance are
+stored in this browser's localStorage.
+
+- **Layout and tuning:** `src/scene/course/courseConfig.ts`, with comments for
+  every value. It holds the zone, `physics` (G, thrust, reverse, turn rate, drag, speed cap,
+  softening fade, step size), the gate, `rings` (in pass order), `wormhole`,
+  `blackHoles` (position, mass, softening, horizon, visual size), and
+  `planets` (position, radius, mass, look). Gravity is
+  `G · mass / (dist² + softening²)`, integrated at a fixed 240 Hz. Planets
+  reuse the About page's planet shader; `palette` picks one of the colour sets
+  at the bottom of the file.
+- **Secret content:** `content/secret.json` has `title`, `text` (Markdown),
+  `image` (optional, a path under `/public`), and `link` (`{ label, url }`;
+  leave `url` empty to hide it).
+- **Testing the ending in dev:** run
+  `document.dispatchEvent(new Event('course:finish-line'))` in the console
+  while racing, and the ship is dropped next to an open wormhole (dev builds
+  only).
+- **Reset your own progress:** clear `tl:course-best` and `tl:anomaly-found`
+  from localStorage.
+
+Code: `src/scene/course/` (`Course.tsx` visuals and keys, `coursePhysics.ts`,
+`courseState.ts`), HUD in `src/ui/CourseHud.tsx`, the overlay in
+`src/ui/SecretPage.tsx`.
 
 ## Cargo Loader (the dashboard game)
 
@@ -203,15 +240,23 @@ very small windows.
 
 Everything tunable is in `src/intro/stacker/config.ts`:
 
-- **Handling** (`HANDLING`): `das` (75 ms), `arr` (0 = instant to the wall),
-  `dcd` (0), `sdf` (`Infinity` = instant soft drop). All in milliseconds of real
-  time, so it plays the same at 60, 120, or 144 Hz.
+- **Handling** (`HANDLING`): `das` (75 ms), `arr` (0 = instant to the wall), `dcd` (0), `sdf` (`Infinity` = instant soft
+  drop). All in milliseconds of real time, so it plays the same at 60, 120, or
+  144 Hz. A held soft drop lands the piece before a held direction moves it, so
+  it slides along the stack rather than across the top.
 - **Keybinds** (`KEYS`): each action maps to a list of `KeyboardEvent.code`
   values (physical keys, e.g. `'KeyX'`, `'ArrowUp'`, `'ShiftLeft'`). Add or
   replace codes; a code should appear under only one action.
-- **Rules** (`RULES`): lock delay (500 ms), lock resets (15), lines per level
+- **Rules** (`RULES`): `timeLimit` (60 000 ms; 0 = endless), lock delay (500 ms; 100 ms while soft
+  drop is held, `softDropLockDelay`), lock resets (15), lines per level
   (10), gravity cap (cells/s), and next-queue length.
 - **Colours** (`THEME`).
+
+Each game is a one-minute run scored by lines cleared (topping out ends it
+early). A score that makes the top 10 asks for a name (12 characters max) and
+lands on the leaderboard, shown on the idle and results screens. The board
+lives in this browser's localStorage (`tl:cargo-scores`, last name in
+`tl:cargo-name`), so each visitor sees their own; clear those keys to reset it.
 
 Rules follow modern guideline play: 7-bag, hold, ghost, SRS+ with TETR.IO's
 kick tables (including 180° and the symmetric I kicks), no ARE or line-clear
@@ -220,7 +265,8 @@ right side panel. Set `game: false` in `src/intro/cockpit.config.ts` to remove
 the screen; the SYSTEMS readout returns in its place.
 
 Code: `engine.ts` (pure game logic), `pieces.ts` (shapes, kick tables),
-`input.ts` (DAS/ARR from key timestamps), `render.ts` (canvas), `Stacker.tsx`
+`input.ts` (DAS/ARR from key timestamps), `render.ts` (canvas), `leaderboard.ts`
+(scores in localStorage), `Stacker.tsx`
 (focus, key listeners, loop), and `engine.test.ts`.
 
 ## How it fits together

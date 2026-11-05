@@ -1,5 +1,5 @@
 import { useFrame } from '@react-three/fiber'
-import { useEffect, useMemo, useRef } from 'react'
+import { useEffect, useMemo, useRef, useState } from 'react'
 import {
   AdditiveBlending,
   BufferAttribute,
@@ -11,13 +11,12 @@ import {
 } from 'three'
 import { flight } from '../flight'
 import { prefersReducedMotion } from '../pointer'
-import { blackHole } from './blackHoleState'
 import { SHIP } from './shipConfig'
 
-const B = SHIP.blackHole
 /** the accretion disk is a ring seen at an angle: its height is squashed by this */
 const TILT = 0.3
-const HALF = B.diskRadius * 1.25
+/** skip drawing and simulating when the camera is this far away sideways */
+const CULL_DISTANCE = 170
 
 const vertexShader = /* glsl */ `
   varying vec2 vUv;
@@ -80,7 +79,6 @@ const fragmentShader = /* glsl */ `
   }
 `
 
-const DUST = 260
 
 const dustVertex = /* glsl */ `
   uniform float uPixelRatio;
@@ -104,14 +102,26 @@ const dustFragment = /* glsl */ `
   }
 `
 
+interface BlackHoleProps {
+  x: number
+  y: number
+  shadowRadius: number
+  diskRadius: number
+  /** dust particle count (fixed for the component's lifetime) */
+  dust?: number
+}
+
 /**
- * Visual for the black hole: a camera-facing disk shader (shadow, photon ring,
- * tilted accretion disk) plus dust spiralling in. Physics live in Ship.
+ * Visual for a black hole: a camera-facing disk shader (shadow, photon ring,
+ * tilted accretion disk) plus dust spiralling in. Physics live elsewhere
+ * (Ship for the galaxy's hole, coursePhysics for the anomaly course).
  */
-export function BlackHole() {
+export function BlackHole({ x, y, shadowRadius, diskRadius, dust = 260 }: BlackHoleProps) {
   const groupRef = useRef<Group>(null)
   const dustRef = useRef<Points<BufferGeometry, ShaderMaterial>>(null)
   const diskRef = useRef<Mesh<BufferGeometry, ShaderMaterial>>(null)
+  const [DUST] = useState(dust)
+  const half = diskRadius * 1.25
   const sim = useRef({ angle: new Float32Array(DUST), radius: new Float32Array(DUST) })
 
   const { material, dustGeometry, dustMaterial } = useMemo(() => {
@@ -121,9 +131,9 @@ export function BlackHole() {
       uniforms: {
         uTime: { value: 0 },
         uReveal: { value: 0 },
-        uHalf: { value: HALF },
-        uShadow: { value: B.shadowRadius },
-        uDisk: { value: B.diskRadius },
+        uHalf: { value: 1 },
+        uShadow: { value: 1 },
+        uDisk: { value: 1 },
         uTilt: { value: TILT },
       },
       transparent: true,
@@ -142,14 +152,17 @@ export function BlackHole() {
       blending: AdditiveBlending,
     })
     return { material, dustGeometry, dustMaterial }
-  }, [])
+  }, [DUST])
 
   useEffect(() => {
     const s = sim.current
     for (let i = 0; i < DUST; i++) {
       s.angle[i] = Math.random() * Math.PI * 2
-      s.radius[i] = B.shadowRadius + Math.random() * (B.diskRadius * 1.3 - B.shadowRadius)
+      s.radius[i] = shadowRadius + Math.random() * (diskRadius * 1.3 - shadowRadius)
     }
+  }, [DUST, shadowRadius, diskRadius])
+
+  useEffect(() => {
     return () => {
       material.dispose()
       dustGeometry.dispose()
@@ -165,10 +178,15 @@ export function BlackHole() {
     const dt = Math.min(delta, 0.05)
     const reduced = prefersReducedMotion()
     const reveal = Math.min(1, flight.reveal)
-    group.visible = reveal > 0.01
+    group.visible = reveal > 0.01 && Math.abs(camera.position.x - x) < CULL_DISTANCE
+    if (!group.visible) return
     // sit just behind the ship's flight plane, facing the camera
-    group.position.set(blackHole.x, blackHole.y, SHIP.spawn.z - 1.5)
+    group.position.set(x, y, SHIP.spawn.z - 1.5)
     group.quaternion.copy(camera.quaternion)
+    const u = disk.material.uniforms
+    u.uHalf.value = half
+    u.uShadow.value = shadowRadius
+    u.uDisk.value = diskRadius
     disk.material.uniforms.uTime.value = clock.elapsedTime * (reduced ? 0.15 : 1)
     disk.material.uniforms.uReveal.value = reveal
     dust.material.uniforms.uReveal.value = reveal
@@ -178,22 +196,22 @@ export function BlackHole() {
     const s = sim.current
     const pos = dust.geometry.getAttribute('position') as BufferAttribute
     const life = dust.geometry.getAttribute('aLife') as BufferAttribute
-    const outer = B.diskRadius * 1.3
+    const outer = diskRadius * 1.3
     const speed = reduced ? 0.15 : 1
     for (let i = 0; i < DUST; i++) {
       const r = s.radius[i]
-      s.angle[i] += 9 * (B.shadowRadius / r) ** 1.5 * dt * speed
-      s.radius[i] -= (0.6 + 2.4 * (B.shadowRadius / r) ** 2) * dt * speed
-      if (s.radius[i] < B.shadowRadius) {
+      s.angle[i] += 9 * (shadowRadius / r) ** 1.5 * dt * speed
+      s.radius[i] -= (0.6 + 2.4 * (shadowRadius / r) ** 2) * dt * speed
+      if (s.radius[i] < shadowRadius) {
         s.radius[i] = outer * (0.8 + Math.random() * 0.2)
         s.angle[i] = Math.random() * Math.PI * 2
       }
       const x = Math.cos(s.angle[i]) * s.radius[i]
       const y = Math.sin(s.angle[i]) * s.radius[i] * TILT
       // the far half disappears behind the shadow
-      const hidden = y > 0 && Math.hypot(x, y) < B.shadowRadius
+      const hidden = y > 0 && Math.hypot(x, y) < shadowRadius
       pos.setXYZ(i, x, y, hidden ? -1000 : 0.05)
-      life.setX(i, (s.radius[i] - B.shadowRadius) / (outer - B.shadowRadius))
+      life.setX(i, (s.radius[i] - shadowRadius) / (outer - shadowRadius))
     }
     pos.needsUpdate = true
     life.needsUpdate = true
@@ -202,7 +220,7 @@ export function BlackHole() {
   return (
     <group ref={groupRef}>
       <mesh ref={diskRef} material={material}>
-        <planeGeometry args={[HALF * 2, HALF * 2]} />
+        <planeGeometry args={[half * 2, half * 2]} />
       </mesh>
       <points ref={dustRef} geometry={dustGeometry} material={dustMaterial} frustumCulled={false} />
     </group>

@@ -240,3 +240,13 @@ body[data-dragging] * {
   cursor: grabbing !important;
   user-select: none;
 }
+
+/* the galaxy hint and the course hint share one row and crossfade */
+.dest-nav > .hud-hint {
+  grid-row: 2;
+  grid-column: 1;
+}
+
+.dest-nav > ul {
+  grid-row: 3;
+}

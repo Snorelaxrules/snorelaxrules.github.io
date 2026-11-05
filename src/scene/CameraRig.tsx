@@ -5,6 +5,8 @@ import { type ClusterConfig, clusterById } from '../content/clusters'
 import { jitter } from '../intro/timeline'
 import { useGalaxy } from '../state/galaxyStore'
 import { useIntro } from '../state/introStore'
+import { COURSE } from './course/courseConfig'
+import { courseView } from './course/courseState'
 import { flight } from './flight'
 import { damp, pointer, prefersReducedMotion } from './pointer'
 import { RIG, heading } from './rig'
@@ -36,21 +38,32 @@ const copyPose = (out: Pose, p: Pose) => {
   return out
 }
 
-/** Home view panned to follow the ship (offset from its spawn point). */
+/**
+ * Home view panned to follow the ship (offset from its spawn point). Inside the
+ * anomaly course (courseView.k → 1) the camera centers on the ship and pulls back.
+ */
 function followPose(out: Pose) {
-  const fx = (ship.pos.x - SHIP.spawn.x) * SHIP.camera.follow
-  const fy = (ship.pos.y - SHIP.spawn.y) * SHIP.camera.follow
-  // add the dragged offset, keeping the view center inside the map; write the
-  // clamp back so dragging past the edge doesn't build up a dead zone
+  const k = courseView.k
+  const homeT = RIG.home.target
+  const gx = (ship.pos.x - SHIP.spawn.x) * SHIP.camera.follow
+  const gy = (ship.pos.y - SHIP.spawn.y) * SHIP.camera.follow
+  const fx = gx + (ship.pos.x - homeT.x - gx) * k
+  const fy = gy + (ship.pos.y - homeT.y - gy) * k
+  // add the dragged offset, keeping the view center inside the map (which
+  // extends right to the course); write the clamp back so dragging past the
+  // edge doesn't build up a dead zone
   const { maxX, minY, maxY } = SHIP.camera.pan
-  const homeY = RIG.home.target.y
-  const dx = Math.max(-maxX, Math.min(maxX, fx + pan.x))
-  const dy = Math.max(minY - homeY, Math.min(maxY - homeY, fy + pan.y))
+  const Z = COURSE.zone
+  const loY = minY + (Z.yMin - minY) * k - homeT.y
+  const hiY = maxY + (Z.yMax - maxY) * k - homeT.y
+  const dx = Math.max(-maxX, Math.min(Z.x1 - 10, fx + pan.x))
+  const dy = Math.max(loY, Math.min(hiY, fy + pan.y))
   pan.x = dx - fx
   pan.y = dy - fy
-  out.pos.set(RIG.home.pos.x + dx, RIG.home.pos.y + dy, RIG.home.pos.z)
-  out.target.set(RIG.home.target.x + dx, RIG.home.target.y + dy, RIG.home.target.z)
-  out.fov = RIG.home.fov
+  const back = COURSE.camera.extraDistance * k
+  out.pos.set(RIG.home.pos.x + dx, RIG.home.pos.y + dy, RIG.home.pos.z + back)
+  out.target.set(homeT.x + dx, homeT.y + dy, homeT.z)
+  out.fov = RIG.home.fov + (COURSE.camera.fov - RIG.home.fov) * k
   return out
 }
 
@@ -99,6 +112,8 @@ export function CameraRig() {
       const k = 1 - Math.exp(-(reduced ? SHIP.camera.lagReduced : SHIP.camera.lag) * dt)
       r.follow.pos.lerp(r.desired.pos, k)
       r.follow.target.lerp(r.desired.target, k)
+      // already eased (courseView.k is damped)
+      r.follow.fov = r.desired.fov
     }
 
     // Start a flight when the active destination changes.

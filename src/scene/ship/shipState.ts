@@ -23,6 +23,9 @@ export const ship = {
   swallowed: -1,
   /** extra spin while swallowed (radians) */
   spin: 0,
+  /** 0..1 stretch along the nose (spaghettification) and overall visual scale, for course effects */
+  stretch: 0,
+  fxScale: 1,
   /** direction of travel when swallowed; we're spat out along it */
   entryX: 0,
   entryY: 1,

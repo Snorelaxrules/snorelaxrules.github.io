@@ -6,8 +6,11 @@ import { IntroLayer } from './intro/IntroLayer'
 import { SpaceCanvas } from './scene/SpaceCanvas'
 import { useGalaxy } from './state/galaxyStore'
 import { useIntro } from './state/introStore'
+import { useCourse } from './scene/course/courseState'
+import { CourseHud } from './ui/CourseHud'
 import { HomeHud } from './ui/HomeHud'
 import { SceneBoundary } from './ui/SceneBoundary'
+import { SecretPage } from './ui/SecretPage'
 import { SectionPage } from './ui/SectionPage'
 import './ui/ui.css'
 
@@ -18,6 +21,7 @@ export default function App() {
   const docked = useGalaxy((s) => s.docked)
   const setActive = useGalaxy((s) => s.setActive)
   const sceneAvailable = useGalaxy((s) => s.sceneAvailable)
+  const secretOpen = useCourse((s) => s.secretOpen)
 
   useEffect(() => {
     setActive(active?.id ?? null)
@@ -53,9 +57,11 @@ export default function App() {
         <div className="space-fallback" aria-hidden="true" />
       )}
       {phase !== 'arrived' && <IntroLayer />}
-      {phase === 'arrived' && <HomeHud visible={!active} />}
+      {phase === 'arrived' && <HomeHud visible={!active && !secretOpen} />}
+      {phase === 'arrived' && sceneAvailable && <CourseHud />}
       <AnimatePresence>
         {active && docked === active.id && <SectionPage key={active.id} cluster={active} />}
+        {secretOpen && !active && <SecretPage key="secret" />}
       </AnimatePresence>
     </>
   )

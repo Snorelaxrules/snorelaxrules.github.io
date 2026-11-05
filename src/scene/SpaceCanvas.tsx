@@ -3,6 +3,7 @@ import { useGalaxy } from '../state/galaxyStore'
 import { JUMP } from '../intro/timeline'
 import { AdaptiveDpr } from './AdaptiveDpr'
 import { CameraRig } from './CameraRig'
+import { Course } from './course/Course'
 import { Galaxies } from './galaxy/Galaxies'
 import { JumpDriver } from './JumpDriver'
 import { Nebula } from './Nebula'
@@ -33,6 +34,7 @@ export function SpaceCanvas() {
         <SkyDome />
         <Galaxies />
         <Ship />
+        <Course />
         <ViewPan />
         <WarpField />
       </Canvas>
