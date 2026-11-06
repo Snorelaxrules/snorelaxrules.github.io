@@ -119,6 +119,9 @@ Waypoints show in array order, and the tracker adapts to any count.
 **Change an interest:** edit the entry for that star in `content/about/interests.json`.
 The constellation is real, so there are exactly seven stars: `polaris` (the anchor,
 drawn brightest), `yildun`, `epsilon`, `zeta`, `eta`, `pherkad`, and `kochab`.
+`photo` is a file in `public/` (`"tetris.jpg"` or `"/tetris.jpg"`). It shows in
+a 16:9 frame, cropped to fill, so landscape shots work best. A video (`.mp4`,
+`.webm`, `.mov`) works the same way: it loops silently with controls to unmute.
 
 ```json
 { "star": "kochab", "title": "Photography", "text": "Why I love it.", "photo": "" }
@@ -242,7 +245,13 @@ very small windows.
 
 Everything tunable is in `src/intro/stacker/config.ts`:
 
-- **Handling** (`HANDLING`): `das` (75 ms), `arr` (0 = instant to the wall), `dcd` (0), `sdf` (`Infinity` = instant soft
+- **Sensitivity** (`HANDLING_PRESETS`): the menu offers Casual, Standard and
+  Expert (keys 1–3 pick one too). Each preset is a full handling set plus a
+  `label` and the small-print `summary`. `DEFAULT_HANDLING` (Standard) is what
+  a first visit gets; the pick is remembered in `tl:cargo-handling`, and saved
+  scores are tagged with it (C / S / E on the leaderboard). Expert is
+  `HANDLING` below.
+- **Handling** (`HANDLING`, Expert): `das` (75 ms), `arr` (0 = instant to the wall), `dcd` (0), `sdf` (`Infinity` = instant soft
   drop). All in milliseconds of real time, so it plays the same at 60, 120, or
   144 Hz. `carryDas` (on): a held direction's charge
   carries into the next piece. `softDropDelay` (120 ms): with soft drop held,

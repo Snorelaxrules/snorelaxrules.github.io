@@ -3,16 +3,20 @@
  * this browser's localStorage. Every access is guarded: with storage blocked
  * the board simply starts empty each visit.
  */
+import { DEFAULT_HANDLING, HANDLING_PRESETS, type HandlingId } from './config'
 
 export interface Score {
   name: string
   lines: number
   /** when it was set (ms since epoch); earlier scores win ties */
   at: number
+  /** the sensitivity it was played on (older scores have none) */
+  mode?: HandlingId
 }
 
 const SCORES_KEY = 'tl:cargo-scores'
 const NAME_KEY = 'tl:cargo-name'
+const HANDLING_KEY = 'tl:cargo-handling'
 export const BOARD_SIZE = 10
 export const NAME_MAX = 12
 
@@ -46,8 +50,8 @@ export function qualifies(lines: number, scores = loadScores()) {
 }
 
 /** Save a score; returns the new board and the new entry's index in it (-1 if it didn't place). */
-export function addScore(name: string, lines: number): { scores: Score[]; index: number } {
-  const entry: Score = { name: cleanName(name), lines, at: Date.now() }
+export function addScore(name: string, lines: number, mode?: HandlingId): { scores: Score[]; index: number } {
+  const entry: Score = { name: cleanName(name), lines, at: Date.now(), mode }
   const scores = [...loadScores(), entry].sort(byRank).slice(0, BOARD_SIZE)
   try {
     localStorage.setItem(SCORES_KEY, JSON.stringify(scores))
@@ -64,5 +68,25 @@ export function lastName() {
     return localStorage.getItem(NAME_KEY) ?? ''
   } catch {
     return ''
+  }
+}
+
+const isHandling = (v: unknown): v is HandlingId => typeof v === 'string' && Object.hasOwn(HANDLING_PRESETS, v)
+
+/** The sensitivity last picked on this browser. */
+export function loadHandling(): HandlingId {
+  try {
+    const v = localStorage.getItem(HANDLING_KEY)
+    return isHandling(v) ? v : DEFAULT_HANDLING
+  } catch {
+    return DEFAULT_HANDLING
+  }
+}
+
+export function saveHandling(id: HandlingId) {
+  try {
+    localStorage.setItem(HANDLING_KEY, id)
+  } catch {
+    // storage unavailable: the choice lasts this session only
   }
 }

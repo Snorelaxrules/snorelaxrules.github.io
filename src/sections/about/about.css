@@ -698,10 +698,14 @@
   color: var(--fg-muted);
 }
 
+/* interest photos and videos share one landscape frame; the image fills it (cropped to fit) */
 .star-card-photo {
   aspect-ratio: 16 / 9;
+  height: auto;
   margin-bottom: 14px;
+  border: 1px solid var(--line);
   border-radius: 10px;
+  background: rgb(3 6 14 / 0.6);
 }
 
 .star-card .star-card-note {

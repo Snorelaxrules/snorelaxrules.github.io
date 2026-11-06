@@ -1,10 +1,11 @@
 import { type FocusEvent, type FormEvent, type PointerEvent as ReactPointerEvent, useEffect, useRef, useState } from 'react'
 import { useIntro } from '../../state/introStore'
 import { useCharge } from './charge'
-import { type Action, RULES } from './config'
+import { type Action, HANDLING_IDS, HANDLING_PRESETS, type HandlingId, RULES } from './config'
 import { Game } from './engine'
 import { InputController, KEY_ACTIONS } from './input'
-import { NAME_MAX, type Score, addScore, lastName, loadScores, qualifies } from './leaderboard'
+import { NAME_MAX, type Score, addScore, lastName, loadHandling, loadScores, qualifies, saveHandling } from './leaderboard'
+import { PieceStrip } from './PieceStrip'
 import { drawBoard, drawPieces } from './render'
 import './stacker.css'
 
@@ -14,6 +15,7 @@ type Status = 'idle' | 'running' | 'paused' | 'entry' | 'board'
 interface RunResult {
   lines: number
   timeUp: boolean
+  mode: HandlingId
 }
 
 interface KeyEvt {
@@ -53,6 +55,10 @@ export function Stacker() {
   /** index of the run just saved, highlighted on the board */
   const [placed, setPlaced] = useState(-1)
   const [name, setName] = useState(lastName)
+  /** sensitivity preset, picked on the menu */
+  const [mode, setMode] = useState<HandlingId>(loadHandling)
+  /** the preset the current run was started with */
+  const runModeRef = useRef<HandlingId>(mode)
   const engaged = useIntro((s) => s.phase !== 'cockpit')
   const running = focused && status === 'running' && !engaged
 
@@ -74,8 +80,8 @@ export function Stacker() {
     const game = new Game()
     game.onLines = (n) => useCharge.getState().add(n)
     gameRef.current = game
-    inputRef.current ??= new InputController()
-    inputRef.current.reset()
+    runModeRef.current = mode
+    inputRef.current = new InputController(HANDLING_PRESETS[mode].handling)
     queueRef.current.length = 0
     setResult(null)
     setPlaced(-1)
@@ -89,7 +95,7 @@ export function Stacker() {
 
   /** the run ended (time up or topped out): name entry if it makes the board */
   const finish = (game: Game) => {
-    const run = { lines: game.lines, timeUp: game.timeUp }
+    const run = { lines: game.lines, timeUp: game.timeUp, mode: runModeRef.current }
     setResult(run)
     const board = loadScores()
     setScores(board)
@@ -99,7 +105,7 @@ export function Stacker() {
   const save = (e?: FormEvent) => {
     e?.preventDefault()
     if (status !== 'entry' || !result) return
-    const { scores: board, index } = addScore(name, result.lines)
+    const { scores: board, index } = addScore(name, result.lines, result.mode)
     setScores(board)
     setPlaced(index)
     setStatus('board')
@@ -111,10 +117,15 @@ export function Stacker() {
     rootRef.current?.focus({ preventScroll: true })
   }
 
+  const pickMode = (id: HandlingId) => {
+    setMode(id)
+    saveHandling(id)
+  }
+
   // the latest render's handlers, for long-lived listeners and the loop
-  const api = useRef({ paint, play, newGame, finish, skipEntry, status })
+  const api = useRef({ paint, play, newGame, finish, skipEntry, pickMode, status })
   useEffect(() => {
-    api.current = { paint, play, newGame, finish, skipEntry, status }
+    api.current = { paint, play, newGame, finish, skipEntry, pickMode, status }
   })
 
   // canvases track their CSS size × devicePixelRatio
@@ -186,6 +197,18 @@ export function Stacker() {
         return
       }
       if (e.metaKey || e.ctrlKey || e.altKey) return
+      const menu = api.current.status === 'idle' || api.current.status === 'board'
+      if (menu && /^Digit[1-9]$/.test(e.code)) {
+        const id = HANDLING_IDS[Number(e.code.slice(5)) - 1]
+        if (id) {
+          e.preventDefault()
+          e.stopPropagation()
+          api.current.pickMode(id)
+          return
+        }
+      }
+      // Enter / Space on a menu button (sensitivity, play) belong to the button
+      if ((e.key === 'Enter' || e.key === ' ') && (e.target as Element | null)?.closest?.('[data-stacker-control]')) return
       const action = KEY_ACTIONS.get(e.code)
       if (!action) {
         if (e.key === 'Enter' && !e.repeat) {
@@ -277,8 +300,8 @@ export function Stacker() {
 
   const onPointerDown = (e: ReactPointerEvent<HTMLDivElement>) => {
     if (engaged || e.button !== 0) return
-    // the name field and its button take clicks normally
-    if (status === 'entry') return
+    // the name field, its button and the sensitivity picker take clicks normally
+    if (status === 'entry' || (e.target as Element).closest('[data-stacker-control]')) return
     e.preventDefault()
     rootRef.current?.focus({ preventScroll: true })
     play()
@@ -300,7 +323,7 @@ export function Stacker() {
   return (
     <div
       ref={rootRef}
-      className={`stacker${focused ? ' is-focused' : ''}${engaged ? ' is-off' : ''}`}
+      className={`stacker${focused ? ' is-focused' : ''}${engaged ? ' is-off' : ''}${status === 'running' ? '' : ' is-menu'}`}
       tabIndex={engaged ? -1 : 0}
       role="application"
       aria-roledescription="game"
@@ -311,7 +334,8 @@ export function Stacker() {
       onBlur={onBlur}
     >
       <p id="stacker-help" className="sr-only">
-        One-minute run: clear as many lines as you can, then add your name to the leaderboard. Click or press Enter to play.
+        One-minute run: clear as many lines as you can, then add your name to the leaderboard. Pick a sensitivity
+        (Casual, Standard or Expert, or keys 1 to 3), then click or press Enter to play.
         Left and right arrows move, down soft drops, space hard drops, up or X rotates clockwise, Z
         counterclockwise, A 180 degrees, Shift or C holds. R restarts, Escape pauses.
       </p>
@@ -351,13 +375,16 @@ export function Stacker() {
           <div className="stacker-panel-main">
             {status === 'idle' || !result ? (
               <>
-                <p className="stacker-kicker">Cargo loader</p>
-                <p className="stacker-title">One minute</p>
-                <p className="stacker-copy">Clear as many lines as you can.</p>
+                <p className="stacker-kicker">Mini-game · one minute</p>
+                <p className="stacker-title is-logo">Cargo loader</p>
+                <PieceStrip />
+                <p className="stacker-copy">Clear as many lines as you can before the timer runs out.</p>
               </>
             ) : (
               <>
-                <p className={`stacker-kicker${result.timeUp ? '' : ' is-warm'}`}>{result.timeUp ? 'Time' : 'Topped out'}</p>
+                <p className={`stacker-kicker${result.timeUp ? '' : ' is-warm'}`}>
+                  {result.timeUp ? 'Time' : 'Topped out'} · {HANDLING_PRESETS[result.mode].label}
+                </p>
                 <p className="stacker-title">
                   <span className="stacker-score">{result.lines}</span> {result.lines === 1 ? 'line' : 'lines'}
                 </p>
@@ -383,9 +410,45 @@ export function Stacker() {
                 <p className="stacker-hint">Enter saves · Esc skips</p>
               </form>
             ) : (
-              <p className="stacker-play">
-                {focused ? `Press Enter${status === 'board' ? ' or R' : ''} to play` : 'Click to play'}
-              </p>
+              <>
+                <div className="stacker-sens" role="radiogroup" aria-label="Sensitivity">
+                  <span className="stacker-sens-label">Sensitivity</span>
+                  <div className="stacker-sens-options">
+                    {HANDLING_IDS.map((id, i) => (
+                      <button
+                        key={id}
+                        type="button"
+                        role="radio"
+                        aria-checked={mode === id}
+                        className={mode === id ? 'is-on' : undefined}
+                        tabIndex={engaged ? -1 : 0}
+                        data-stacker-control=""
+                        title={`${HANDLING_PRESETS[id].summary} (key ${i + 1})`}
+                        onClick={() => {
+                          pickMode(id)
+                          rootRef.current?.focus({ preventScroll: true })
+                        }}
+                      >
+                        {HANDLING_PRESETS[id].label}
+                      </button>
+                    ))}
+                  </div>
+                  <span className="stacker-sens-summary">{HANDLING_PRESETS[mode].summary}</span>
+                </div>
+                <button
+                  type="button"
+                  className="stacker-play"
+                  tabIndex={engaged ? -1 : 0}
+                  data-stacker-control=""
+                  onClick={() => {
+                    rootRef.current?.focus({ preventScroll: true })
+                    play()
+                  }}
+                >
+                  <span aria-hidden="true">▶</span> {status === 'board' ? 'Play again' : 'Play'}
+                  <span className="stacker-play-key">{focused ? (status === 'board' ? 'Enter · R' : 'Enter') : 'click'}</span>
+                </button>
+              </>
             )}
           </div>
           <div className="stacker-panel-board">
@@ -396,6 +459,9 @@ export function Stacker() {
                   <li key={`${s.at}-${i}`} className={i === placed ? 'is-new' : undefined}>
                     <span className="rank">{i + 1}</span>
                     <span className="who">{s.name}</span>
+                    <span className="mode" title={s.mode ? HANDLING_PRESETS[s.mode]?.label : undefined}>
+                      {s.mode ? (HANDLING_PRESETS[s.mode]?.label.charAt(0) ?? '') : ''}
+                    </span>
                     <span className="lines">{s.lines}</span>
                   </li>
                 ))}

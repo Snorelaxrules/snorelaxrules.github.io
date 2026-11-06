@@ -1,12 +1,47 @@
 {
-  "$comment": "About → Constellation. One interest per star of Ursa Minor. star must be one of: polaris, yildun, epsilon, zeta, eta, pherkad, kochab. Polaris is the anchor (core interest). photo is optional.",
-  "interests": [
-    { "star": "polaris", "title": "[Placeholder: core interest]", "text": "[Placeholder: the thing everything else orbits around. Why it matters to you.]", "photo": "" },
-    { "star": "yildun", "title": "[Placeholder: interest]", "text": "[Placeholder: a sentence or two about this interest.]", "photo": "" },
-    { "star": "epsilon", "title": "[Placeholder: interest]", "text": "[Placeholder: a sentence or two about this interest.]", "photo": "" },
-    { "star": "zeta", "title": "[Placeholder: interest]", "text": "[Placeholder: a sentence or two about this interest.]", "photo": "" },
-    { "star": "eta", "title": "[Placeholder: interest]", "text": "[Placeholder: a sentence or two about this interest.]", "photo": "" },
-    { "star": "pherkad", "title": "[Placeholder: interest]", "text": "[Placeholder: a sentence or two about this interest.]", "photo": "" },
-    { "star": "kochab", "title": "[Placeholder: interest]", "text": "[Placeholder: a sentence or two about this interest.]", "photo": "" }
-  ]
+    "$comment": "About → Constellation. One interest per star of Ursa Minor. star must be one of: polaris, yildun, epsilon, zeta, eta, pherkad, kochab. Polaris is the anchor (core interest). photo is optional.",
+    "interests": [
+        {
+            "star": "polaris",
+            "title": "Tetris",
+            "text": "The thrill of split-second decisions, sending spikes, downstacking, and building convoluted spins.",
+            "photo": "tetris.jpg"
+        },
+        {
+            "star": "yildun",
+            "title": "Piano",
+            "text": "Originally classically trained, I now enjoy playing a variety of music, from pop to classical. Current projects: Another Love, Mariage d'Amour, 我的歌聲裡.",
+            "photo": "piano.mp4"
+        },
+        {
+            "star": "epsilon",
+            "title": "Volleyball",
+            "text": "My favorite sport by far. Teammates know that I am a better libero than middle but still pack a nasty pin block.",
+            "photo": "/volleyballteam.jpg"
+        },
+        {
+            "star": "zeta",
+            "title": "[Placeholder: interest]",
+            "text": "[Placeholder: a sentence or two about this interest.]",
+            "photo": ""
+        },
+        {
+            "star": "eta",
+            "title": "[Placeholder: interest]",
+            "text": "[Placeholder: a sentence or two about this interest.]",
+            "photo": ""
+        },
+        {
+            "star": "pherkad",
+            "title": "[Placeholder: interest]",
+            "text": "[Placeholder: a sentence or two about this interest.]",
+            "photo": ""
+        },
+        {
+            "star": "kochab",
+            "title": "[Placeholder: interest]",
+            "text": "[Placeholder: a sentence or two about this interest.]",
+            "photo": ""
+        }
+    ]
 }

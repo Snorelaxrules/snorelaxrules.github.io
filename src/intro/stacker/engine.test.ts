@@ -1,6 +1,6 @@
 import { describe, expect, it } from 'vitest'
 import { Bag, Game, WIDTH, pieceCells, seededRandom, spawnPosition } from './engine'
-import type { Rules } from './config'
+import { HANDLING_PRESETS, type Rules } from './config'
 import { InputController } from './input'
 import { PIECES, type PieceType } from './pieces'
 
@@ -366,5 +366,36 @@ describe('timed mode', () => {
     game.holdPiece()
     expect(game.over).toBe(true)
     expect(game.timeUp).toBe(false)
+  })
+})
+
+describe('sensitivity presets', () => {
+  it('casual auto-shifts later and one cell at a time; expert slides to the wall', () => {
+    const casual = gameWith('T')
+    const ci = new InputController(HANDLING_PRESETS.casual.handling)
+    ci.press('moveRight', 0, casual)
+    ci.update(150, casual)
+    expect(casual.active!.x).toBe(4) // still charging
+    ci.update(167, casual)
+    expect(casual.active!.x).toBe(5)
+    ci.update(200, casual)
+    expect(casual.active!.x).toBe(6)
+
+    const expert = gameWith('T')
+    const ei = new InputController(HANDLING_PRESETS.expert.handling)
+    ei.press('moveRight', 0, expert)
+    ei.update(75, expert)
+    expect(expert.active!.x).toBe(7)
+  })
+
+  it('finite soft drop falls over time instead of teleporting', () => {
+    const game = gameWith('T')
+    const input = new InputController(HANDLING_PRESETS.casual.handling)
+    const y0 = game.active!.y
+    input.press('softDrop', 0, game)
+    expect(game.active!.y).toBe(y0)
+    game.tick(500, input.gravityFactor(500))
+    expect(y0 - game.active!.y).toBe(5) // 1 cell/s × 10 for half a second
+    expect(game.grounded).toBe(false)
   })
 })

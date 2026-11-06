@@ -27,6 +27,34 @@ export const HANDLING = {
 
 export type Handling = typeof HANDLING
 
+export type HandlingId = 'casual' | 'standard' | 'expert'
+
+/**
+ * The sensitivities offered on the game's menu. Expert is HANDLING above.
+ * `summary` is the small print under the picker.
+ */
+export const HANDLING_PRESETS: Record<HandlingId, { label: string; summary: string; handling: Handling }> = {
+  casual: {
+    label: 'Casual',
+    summary: 'DAS 167 · ARR 33 · soft drop ×10',
+    handling: { das: 167, arr: 33, dcd: 0, sdf: 10, carryDas: false, softDropDelay: 0 },
+  },
+  standard: {
+    label: 'Standard',
+    summary: 'DAS 117 · ARR 17 · soft drop ×30',
+    handling: { das: 117, arr: 17, dcd: 0, sdf: 30, carryDas: true, softDropDelay: 0 },
+  },
+  expert: {
+    label: 'Expert',
+    summary: 'DAS 75 · ARR 0 · instant soft drop',
+    handling: HANDLING,
+  },
+}
+
+export const HANDLING_IDS = Object.keys(HANDLING_PRESETS) as HandlingId[]
+/** what a first-time visitor gets; the choice is remembered per browser */
+export const DEFAULT_HANDLING: HandlingId = 'standard'
+
 /** Game rules. */
 export const RULES = {
   /** game length in ms; the score is lines cleared. 0 = endless */
