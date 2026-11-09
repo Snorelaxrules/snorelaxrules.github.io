@@ -45,7 +45,6 @@
         },
         {
             "title": "Studies",
-            "strip": ["Computer Science", "AI", "Business"],
             "rows": [
                 {
                     "label": "Major",

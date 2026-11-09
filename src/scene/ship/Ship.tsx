@@ -6,7 +6,7 @@ import { goTo, useGalaxy } from '../../state/galaxyStore'
 import { useIntro } from '../../state/introStore'
 import { COURSE } from '../course/courseConfig'
 import { inCourseZone, stepCourse } from '../course/coursePhysics'
-import { course, courseView, resetRace, useCourse } from '../course/courseState'
+import { course, courseView, enterCourse, resetRace, useCourse } from '../course/courseState'
 import { flight } from '../flight'
 import { damp, prefersReducedMotion } from '../pointer'
 import { SHIP, rangeOf } from './shipConfig'
@@ -219,7 +219,8 @@ export function Ship() {
     const inZone = flying && !swallowed && inCourseZone(pos.x)
     if (inZone !== course.inZone) {
       course.inZone = inZone
-      if (!inZone) resetRace()
+      if (inZone) enterCourse()
+      else resetRace()
       useCourse.getState().set({ inCourse: inZone })
     }
     courseView.k = damp(courseView.k, inZone ? 1 : 0, reduced ? 6 : COURSE.camera.blendRate, dt)

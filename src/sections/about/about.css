@@ -559,6 +559,26 @@
   }
 }
 
+.constellation-head {
+  grid-column: 1 / -1;
+  display: flex;
+  flex-wrap: wrap;
+  align-items: baseline;
+  gap: 6px 16px;
+  margin-bottom: -12px;
+}
+
+.constellation-head h2 {
+  margin: 0;
+  font: 600 1.35rem var(--font-display);
+  letter-spacing: 0.04em;
+}
+
+.constellation-head p {
+  margin: 0;
+  color: var(--fg-muted);
+}
+
 .star-map {
   border: 1px solid var(--line);
   border-radius: 16px;

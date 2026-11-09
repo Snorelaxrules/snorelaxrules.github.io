@@ -58,6 +58,27 @@
 
 .dest-nav {
   position: absolute;
+  top: 18px;
+  left: 50%;
+  transform: translateX(-50%);
+  transition:
+    opacity 0.3s,
+    transform 0.3s;
+}
+
+.dest-nav.is-away {
+  opacity: 0;
+  transform: translate(-50%, -12px);
+  pointer-events: none;
+}
+
+.dest-nav.is-away button {
+  pointer-events: none;
+}
+
+/* prompt + hints along the bottom */
+.hud-bottom {
+  position: absolute;
   left: 50%;
   bottom: 28px;
   transform: translateX(-50%);
@@ -189,34 +210,42 @@
   background: linear-gradient(rgb(3 5 11 / 0.9), rgb(3 5 11 / 0));
 }
 
-.page-bar-title {
-  font: 500 12px var(--font-display);
-  letter-spacing: 0.3em;
-  text-transform: uppercase;
-  color: var(--fg-muted);
-}
-
 .page-back {
   display: inline-flex;
   align-items: center;
-  gap: 8px;
-  padding: 7px 14px;
-  border: 1px solid var(--line);
+  gap: 10px;
+  padding: 9px 18px 9px 14px;
+  border: 1px solid rgb(122 224 255 / 0.7);
   border-radius: 999px;
-  background: rgb(4 6 13 / 0.6);
-  color: var(--fg-muted);
-  font: 500 12px var(--font-display);
+  background: rgb(122 224 255 / 0.14);
+  color: #eaf8ff;
+  font: 600 12px var(--font-display);
   letter-spacing: 0.18em;
   text-transform: uppercase;
+  box-shadow: 0 0 18px rgb(122 224 255 / 0.18);
+  backdrop-filter: blur(6px);
   cursor: pointer;
   transition:
-    color 0.2s,
-    border-color 0.2s;
+    background 0.2s,
+    box-shadow 0.2s;
 }
 
-.page-back:hover {
+.page-back-arrow {
+  font-size: 15px;
+  line-height: 1;
   color: var(--accent);
-  border-color: var(--accent);
+  transition: transform 0.2s;
+}
+
+.page-back:hover,
+.page-back:focus-visible {
+  background: rgb(122 224 255 / 0.26);
+  box-shadow: 0 0 26px rgb(122 224 255 / 0.35);
+  outline: none;
+}
+
+.page-back:hover .page-back-arrow {
+  transform: translateX(-3px);
 }
 
 .page-main {
@@ -241,12 +270,173 @@ body[data-dragging] * {
   user-select: none;
 }
 
-/* the galaxy hint and the course hint share one row and crossfade */
-.dest-nav > .hud-hint {
+/* the galaxy hint and the course controls share one slot and crossfade */
+.hud-bottom > .hud-hint,
+.hud-bottom > .course-controls {
   grid-row: 2;
   grid-column: 1;
+  align-self: end;
 }
 
-.dest-nav > ul {
-  grid-row: 3;
+@media (max-width: 860px) {
+  /* room for the brand: the nav drops below it */
+  .dest-nav {
+    top: 52px;
+    max-width: calc(100vw - 24px);
+  }
+
+  .dest-nav ul {
+    overflow-x: auto;
+    scrollbar-width: none;
+  }
+
+  .dest-nav button {
+    padding: 7px 12px;
+    letter-spacing: 0.12em;
+  }
+
+  .hud-bottom {
+    width: calc(100vw - 32px);
+  }
+
+  .hud-hint {
+    flex-wrap: wrap;
+    justify-content: center;
+    row-gap: 6px;
+    white-space: normal;
+    text-align: center;
+    line-height: 1.6;
+  }
+}
+
+/* --- anomaly course: return button + controls card ---------------------------- */
+
+.course-exit {
+  position: absolute;
+  top: 56px;
+  left: 24px;
+  display: inline-flex;
+  align-items: center;
+  gap: 10px;
+  padding: 9px 16px;
+  border: 1px solid rgb(122 224 255 / 0.7);
+  border-radius: 999px;
+  background: rgb(122 224 255 / 0.14);
+  color: #eaf8ff;
+  font: 600 12px var(--font-display);
+  letter-spacing: 0.18em;
+  text-transform: uppercase;
+  box-shadow: 0 0 18px rgb(122 224 255 / 0.2);
+  backdrop-filter: blur(6px);
+  cursor: pointer;
+  transition:
+    background 0.2s,
+    box-shadow 0.2s;
+}
+
+.course-exit:hover,
+.course-exit:focus-visible {
+  background: rgb(122 224 255 / 0.26);
+  box-shadow: 0 0 26px rgb(122 224 255 / 0.35);
+  outline: none;
+}
+
+.home-hud .course-exit kbd {
+  min-width: 0;
+  height: 18px;
+  font-size: 9px;
+}
+
+.course-controls {
+  display: grid;
+  justify-items: center;
+  gap: 10px;
+  padding: 12px 20px 11px;
+  border: 1px solid rgb(255 179 107 / 0.45);
+  border-radius: 12px;
+  background: rgb(14 9 4 / 0.62);
+  backdrop-filter: blur(8px);
+  box-shadow: 0 0 28px rgb(255 154 77 / 0.14);
+  user-select: none;
+}
+
+.course-controls p {
+  margin: 0;
+}
+
+.course-controls-head {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  font: 500 11px var(--font-display);
+  letter-spacing: 0.16em;
+  text-transform: uppercase;
+  color: var(--fg-muted);
+  white-space: nowrap;
+}
+
+.course-controls-badge {
+  padding: 3px 8px;
+  border-radius: 4px;
+  background: var(--accent-warm);
+  color: #2a1204;
+  font-weight: 700;
+  letter-spacing: 0.18em;
+  animation: badge-blink 1.1s ease-in-out 4;
+}
+
+@keyframes badge-blink {
+  50% {
+    opacity: 0.35;
+  }
+}
+
+.course-controls-keys {
+  display: flex;
+  gap: 22px;
+}
+
+.course-key {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  font: 600 13px var(--font-display);
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+  color: var(--fg);
+  white-space: nowrap;
+}
+
+.course-key .keys {
+  display: inline-flex;
+  gap: 3px;
+}
+
+.home-hud .course-key kbd {
+  min-width: 26px;
+  height: 26px;
+  border-color: rgb(255 179 107 / 0.6);
+  color: var(--accent-warm);
+  font-size: 12px;
+}
+
+.course-controls-more {
+  display: flex;
+  align-items: center;
+  gap: 7px;
+  font: 500 10px var(--font-display);
+  letter-spacing: 0.2em;
+  text-transform: uppercase;
+  color: var(--fg-muted);
+  white-space: nowrap;
+}
+
+.course-controls-more .sep {
+  opacity: 0.5;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .course-controls-badge {
+    animation: none;
+  }
 }

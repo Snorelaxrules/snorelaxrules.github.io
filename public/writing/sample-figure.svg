@@ -1,0 +1,15 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1600 800" role="img" aria-label="Placeholder diagram: light leaving a star and arriving years later">
+  <rect width="1600" height="800" fill="#060a14"/>
+  <g stroke="#7ae0ff" stroke-opacity="0.12">
+    <path d="M0 200 H1600 M0 400 H1600 M0 600 H1600 M400 0 V800 M800 0 V800 M1200 0 V800"/>
+  </g>
+  <circle cx="240" cy="400" r="70" fill="#ffd27a"/>
+  <circle cx="240" cy="400" r="120" fill="#ffb36b" fill-opacity="0.12"/>
+  <circle cx="1360" cy="400" r="40" fill="#5d8bff"/>
+  <path d="M330 400 H1300" stroke="#7ae0ff" stroke-width="4" stroke-dasharray="18 14"/>
+  <path d="M1280 380 L1310 400 L1280 420" fill="none" stroke="#7ae0ff" stroke-width="4"/>
+  <text x="240" y="560" fill="#dfe7f5" font-family="sans-serif" font-size="34" text-anchor="middle">star, then</text>
+  <text x="1360" y="560" fill="#dfe7f5" font-family="sans-serif" font-size="34" text-anchor="middle">you, now</text>
+  <text x="800" y="360" fill="#8a97b0" font-family="sans-serif" font-size="30" text-anchor="middle">light in transit</text>
+  <text x="80" y="740" fill="#8a97b0" font-family="sans-serif" font-size="26" letter-spacing="6">PLACEHOLDER FIGURE</text>
+</svg>

@@ -123,6 +123,17 @@ export function respawn() {
   course.flash = Math.max(course.flash, 0.35)
 }
 
+/**
+ * Fly into the course zone: straight to the spawn point in front of the start
+ * gate, stopped and facing it, instead of drifting in on galaxy momentum.
+ */
+export function enterCourse() {
+  resetRace()
+  placeShip(COURSE.gate.x - COURSE.gate.radius - 4, COURSE.gate.y)
+  ship.heading = 0
+  course.flash = Math.max(course.flash, 0.35)
+}
+
 /** Leave the course: back to the galaxy side, next to the gate. */
 export function exitCourse() {
   resetRace()

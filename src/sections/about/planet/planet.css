@@ -483,6 +483,26 @@
   background: rgb(122 224 255 / 0.14);
 }
 
+/* the main call to action: warm and filled */
+.scan-btn.is-primary {
+  border-color: rgb(255 200 140 / 0.9);
+  background: linear-gradient(180deg, #ffbe7a, #f08a3c);
+  color: #2a1204;
+  box-shadow: 0 0 18px rgb(255 150 70 / 0.35);
+}
+
+.scan-btn.is-primary::before,
+.scan-btn.is-primary::after {
+  color: #2a1204;
+  opacity: 0.55;
+}
+
+.scan-btn.is-primary:hover {
+  border-color: #ffd9b0;
+  background: linear-gradient(180deg, #ffc98e, #f59a52);
+  box-shadow: 0 0 26px rgb(255 150 70 / 0.5);
+}
+
 .readout-skip {
   position: absolute;
   right: 20px;

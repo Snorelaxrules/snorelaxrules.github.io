@@ -1,0 +1,706 @@
+/*
+ * Writing: a quick-to-scan essay list, and a reading view built for long text:
+ * a near-solid panel over the dimmed galaxy, a ~65ch serif column, and calm
+ * markdown styles. Text sizes are relative to the column's --essay-size.
+ */
+
+/* --- index ------------------------------------------------------------------ */
+
+.essays {
+  max-width: 760px;
+  margin: 0 auto;
+}
+
+.essay-list {
+  margin: 8px 0 0;
+  padding: 0;
+  list-style: none;
+  border-top: 1px solid var(--line);
+}
+
+.essay-list li {
+  border-bottom: 1px solid var(--line);
+}
+
+.essay-item {
+  position: relative;
+  display: grid;
+  gap: 6px;
+  padding: 24px 20px 24px 22px;
+  color: inherit;
+  text-decoration: none;
+  transition: background 0.18s;
+}
+
+/* accent line on the left, drawn in on hover / focus */
+.essay-item::before {
+  content: '';
+  position: absolute;
+  left: 0;
+  top: 18px;
+  bottom: 18px;
+  width: 2px;
+  border-radius: 2px;
+  background: var(--accent);
+  box-shadow: 0 0 10px rgb(122 224 255 / 0.6);
+  transform: scaleY(0);
+  transition: transform 0.18s ease-out;
+}
+
+.essay-item:hover,
+.essay-item:focus-visible {
+  background: linear-gradient(90deg, rgb(122 224 255 / 0.06), transparent 70%);
+  outline: none;
+}
+
+.essay-item:hover::before,
+.essay-item:focus-visible::before {
+  transform: scaleY(1);
+}
+
+.essay-item h2 {
+  margin: 0;
+  font: 600 1.45rem / 1.25 var(--font-display);
+  letter-spacing: 0.01em;
+  color: var(--fg);
+  transition:
+    color 0.18s,
+    text-shadow 0.18s;
+}
+
+.essay-item:hover h2,
+.essay-item:focus-visible h2 {
+  color: #eaf8ff;
+  text-shadow: 0 0 18px rgb(122 224 255 / 0.35);
+}
+
+.essay-item-meta,
+.essay-meta {
+  margin: 0;
+  font: 500 12px var(--font-display);
+  letter-spacing: 0.18em;
+  text-transform: uppercase;
+  color: var(--fg-muted);
+}
+
+.essay-item-summary {
+  margin: 0;
+  max-width: 62ch;
+  color: var(--fg-muted);
+  line-height: 1.55;
+}
+
+/* --- reading view ------------------------------------------------------------- */
+
+.essay {
+  outline: none;
+}
+
+.essay-panel {
+  max-width: 920px;
+  margin: 0 auto;
+  padding: clamp(20px, 4vw, 44px) clamp(18px, 6vw, 80px) clamp(32px, 6vw, 64px);
+  border: 1px solid rgb(122 224 255 / 0.12);
+  border-radius: 18px;
+  /* near-solid: the galaxy behind never shows through the text */
+  background: rgb(8 11 21 / 0.96);
+  box-shadow: 0 30px 80px rgb(0 0 0 / 0.45);
+}
+
+.essay-column {
+  --essay-size: 19px;
+  max-width: 65ch;
+  margin: 0 auto;
+  font-family: 'Literata Variable', Georgia, 'Times New Roman', serif;
+  font-size: var(--essay-size);
+  line-height: 1.7;
+  color: #e4e9f3;
+  font-optical-sizing: auto;
+  text-rendering: optimizeLegibility;
+  overflow-wrap: break-word;
+}
+
+.essay-size-s .essay-column {
+  --essay-size: 17px;
+}
+
+.essay-size-l .essay-column {
+  --essay-size: 21px;
+}
+
+@media (max-width: 600px) {
+  /* on a phone the sticky Back to galaxy bar would sit on the text; while
+     reading it scrolls away (Essays, the footer links and Esc remain) */
+  .page:has(.essay) .page-bar {
+    position: relative;
+  }
+
+  /* nearly edge to edge: the page's side padding and the panel's don't stack up */
+  .essay-panel {
+    margin-inline: -14px;
+    padding-inline: 18px;
+    border-radius: 14px;
+  }
+
+  .essay-column {
+    --essay-size: 17.5px;
+  }
+
+  .essay-size-s .essay-column {
+    --essay-size: 16px;
+  }
+
+  .essay-size-l .essay-column {
+    --essay-size: 19.5px;
+  }
+}
+
+.essay ::selection {
+  background: rgb(122 224 255 / 0.3);
+  color: #fff;
+}
+
+.essay-topbar {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 2.2em;
+}
+
+.essay-back,
+.essay-all {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  font: 600 12px var(--font-display);
+  letter-spacing: 0.2em;
+  text-transform: uppercase;
+  color: var(--accent);
+  text-decoration: none;
+}
+
+.essay-back:hover,
+.essay-all:hover {
+  color: #eaf8ff;
+}
+
+/* reader menu */
+.reader-menu {
+  position: relative;
+}
+
+.reader-menu-toggle {
+  display: grid;
+  place-items: center;
+  width: 36px;
+  height: 36px;
+  border: 1px solid var(--line);
+  border-radius: 50%;
+  background: rgb(122 224 255 / 0.05);
+  color: var(--fg);
+  font: 600 15px var(--font-display);
+  cursor: pointer;
+  transition:
+    border-color 0.15s,
+    background 0.15s;
+}
+
+.reader-menu-toggle small {
+  font-size: 11px;
+}
+
+.reader-menu-toggle:hover,
+.reader-menu-toggle[aria-expanded='true'] {
+  border-color: var(--accent);
+  background: rgb(122 224 255 / 0.12);
+}
+
+.reader-menu-panel {
+  position: absolute;
+  top: calc(100% + 8px);
+  right: 0;
+  z-index: 2;
+  padding: 12px;
+  border: 1px solid var(--line);
+  border-radius: 12px;
+  background: #0b1120;
+  box-shadow: 0 16px 40px rgb(0 0 0 / 0.5);
+}
+
+.reader-menu-label {
+  margin: 0 0 8px;
+  font: 500 11px var(--font-display);
+  letter-spacing: 0.2em;
+  text-transform: uppercase;
+  color: var(--fg-muted);
+  white-space: nowrap;
+}
+
+.reader-sizes {
+  display: flex;
+  gap: 6px;
+}
+
+.reader-sizes button {
+  display: grid;
+  place-items: center;
+  width: 40px;
+  height: 36px;
+  border: 1px solid var(--line);
+  border-radius: 8px;
+  background: none;
+  color: var(--fg-muted);
+  font-family: 'Literata Variable', Georgia, serif;
+  cursor: pointer;
+}
+
+.reader-sizes .size-s {
+  font-size: 13px;
+}
+
+.reader-sizes .size-m {
+  font-size: 16px;
+}
+
+.reader-sizes .size-l {
+  font-size: 19px;
+}
+
+.reader-sizes button:hover {
+  color: var(--fg);
+  border-color: rgb(122 224 255 / 0.4);
+}
+
+.reader-sizes button.is-on {
+  border-color: var(--accent);
+  background: rgb(122 224 255 / 0.14);
+  color: #eaf8ff;
+}
+
+/* header */
+.essay-head {
+  margin-bottom: 2em;
+  padding-bottom: 1.6em;
+  border-bottom: 1px solid var(--line);
+}
+
+.essay-head h1 {
+  margin: 0.35em 0 0.35em;
+  font: 600 clamp(2rem, 4.6vw, 2.85rem) / 1.12 var(--font-display);
+  letter-spacing: 0.005em;
+  color: #f2f6ff;
+}
+
+.essay-dek {
+  margin: 0;
+  font-size: 1.1em;
+  line-height: 1.5;
+  color: #aab6cc;
+}
+
+.essay-cover {
+  margin: 0 0 2.2em;
+}
+
+.essay-cover img {
+  display: block;
+  width: 100%;
+  aspect-ratio: 16 / 9;
+  object-fit: cover;
+  border: 1px solid var(--line);
+  border-radius: 12px;
+}
+
+/* --- essay body (markdown) ------------------------------------------------------ */
+
+.essay-body > :first-child {
+  margin-top: 0;
+}
+
+.essay-body p {
+  margin: 0 0 1.2em;
+}
+
+.essay-body h2,
+.essay-body h3 {
+  font-family: var(--font-display);
+  color: #f2f6ff;
+  line-height: 1.25;
+  letter-spacing: 0.01em;
+  text-wrap: balance;
+}
+
+.essay-body h2 {
+  margin: 2.1em 0 0.65em;
+  font-size: 1.42em;
+  font-weight: 600;
+}
+
+.essay-body h3 {
+  margin: 1.8em 0 0.5em;
+  font-size: 1.14em;
+  font-weight: 600;
+}
+
+.essay-body a {
+  color: #8fe6ff;
+  text-decoration: underline;
+  text-decoration-color: rgb(143 230 255 / 0.45);
+  text-decoration-thickness: 1px;
+  text-underline-offset: 0.18em;
+  transition: text-decoration-color 0.15s;
+}
+
+.essay-body a:hover {
+  text-decoration-color: currentColor;
+}
+
+.essay-body strong {
+  font-weight: 650;
+  color: #f2f6ff;
+}
+
+.essay-body ul,
+.essay-body ol {
+  margin: 0 0 1.2em;
+  padding-left: 1.4em;
+}
+
+.essay-body li {
+  margin: 0.35em 0;
+  padding-left: 0.2em;
+}
+
+.essay-body li::marker {
+  color: rgb(255 179 107 / 0.8);
+}
+
+.essay-body li > p {
+  margin-bottom: 0.4em;
+}
+
+.essay-body blockquote {
+  margin: 1.8em 0;
+  padding: 0.1em 0 0.1em 1.2em;
+  border-left: 3px solid rgb(255 179 107 / 0.7);
+  color: #c7d0df;
+  font-style: italic;
+}
+
+.essay-body blockquote p:last-child {
+  margin-bottom: 0;
+}
+
+/* pull quote: > [!pull] ... */
+.essay-body blockquote.pull-quote {
+  margin: 2.2em 0;
+  padding: 0.9em 0;
+  border: 0;
+  border-top: 1px solid rgb(255 179 107 / 0.45);
+  border-bottom: 1px solid rgb(255 179 107 / 0.45);
+  font: 500 1.36em / 1.38 var(--font-display);
+  font-style: normal;
+  letter-spacing: 0.01em;
+  text-align: center;
+  text-wrap: balance;
+  color: var(--accent-warm);
+}
+
+.essay-body code {
+  padding: 0.12em 0.38em;
+  border: 1px solid rgb(122 224 255 / 0.14);
+  border-radius: 4px;
+  background: rgb(122 224 255 / 0.07);
+  font: 0.84em var(--font-mono);
+}
+
+.essay-body pre {
+  margin: 1.6em 0;
+  padding: 1em 1.2em;
+  overflow-x: auto;
+  border: 1px solid var(--line);
+  border-radius: 10px;
+  background: #050912;
+  font-size: 0.8em;
+  line-height: 1.6;
+}
+
+.essay-body pre code {
+  padding: 0;
+  border: 0;
+  background: none;
+  font-size: 1em;
+}
+
+/* section break: a small asterism instead of a full rule */
+.essay-body hr {
+  height: auto;
+  margin: 2.4em 0;
+  border: 0;
+  text-align: center;
+}
+
+.essay-body hr::after {
+  content: '✦ ✦ ✦';
+  color: rgb(255 179 107 / 0.65);
+  font-size: 0.7em;
+  letter-spacing: 0.9em;
+}
+
+.essay-figure {
+  margin: 2em 0;
+}
+
+.essay-figure img,
+.essay-figure .essay-img-missing {
+  display: block;
+  width: 100%;
+  height: auto;
+  border: 1px solid var(--line);
+  border-radius: 10px;
+}
+
+.essay-figure figcaption {
+  margin-top: 0.7em;
+  font: 400 0.76em / 1.5 var(--font-body);
+  color: var(--fg-muted);
+  text-align: center;
+}
+
+.essay-img-inline {
+  max-width: 100%;
+  vertical-align: middle;
+}
+
+.essay-img-missing {
+  display: inline-block;
+  padding: 0.6em 0.9em;
+  border: 1px dashed rgb(122 224 255 / 0.3);
+  border-radius: 8px;
+  font: 400 0.76em var(--font-body);
+  color: var(--fg-muted);
+}
+
+.essay-figure .essay-img-missing {
+  display: grid;
+  place-items: center;
+  padding: 2.4em 1em;
+  border-style: dashed;
+  background: rgb(122 224 255 / 0.03);
+  text-align: center;
+}
+
+.essay-table {
+  margin: 1.8em 0;
+  overflow-x: auto;
+}
+
+.essay-body table {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: 0.86em;
+  line-height: 1.5;
+}
+
+.essay-body th,
+.essay-body td {
+  padding: 0.5em 0.8em;
+  border-bottom: 1px solid var(--line);
+  text-align: left;
+}
+
+.essay-body th {
+  font: 600 0.82em var(--font-display);
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  color: var(--fg-muted);
+}
+
+/* footnotes (GFM: [^1] in the text, [^1]: ... at the end) */
+.essay-body sup {
+  line-height: 0;
+}
+
+.essay-body a[data-footnote-ref] {
+  padding: 0 0.15em;
+  font: 600 0.78em var(--font-display);
+  text-decoration: none;
+}
+
+.essay-body .footnotes {
+  margin-top: 3em;
+  padding-top: 1.2em;
+  border-top: 1px solid var(--line);
+  font-size: 0.84em;
+  line-height: 1.6;
+  color: #b4bfd2;
+}
+
+.essay-body .footnotes::before {
+  content: 'Notes';
+  display: block;
+  margin-bottom: 0.8em;
+  font: 600 12px var(--font-display);
+  letter-spacing: 0.22em;
+  text-transform: uppercase;
+  color: rgb(255 179 107 / 0.85);
+}
+
+.essay-body .footnotes ol {
+  padding-left: 1.3em;
+}
+
+.essay-body .footnotes li p {
+  margin: 0.3em 0;
+}
+
+.essay-body a[data-footnote-backref] {
+  text-decoration: none;
+}
+
+/* the footnote (or reference) jumped to */
+.essay-body li:focus,
+.essay-body a[data-footnote-ref]:focus {
+  outline: none;
+  animation: note-flash 1.4s ease-out;
+}
+
+@keyframes note-flash {
+  from {
+    background: rgb(255 179 107 / 0.22);
+  }
+  to {
+    background: transparent;
+  }
+}
+
+/* --- footer ------------------------------------------------------------------------ */
+
+.essay-foot {
+  margin-top: 3em;
+  padding-top: 1.6em;
+  border-top: 1px solid var(--line);
+}
+
+.essay-pager {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 12px;
+}
+
+.essay-pager-link {
+  display: grid;
+  gap: 4px;
+  padding: 14px 16px;
+  border: 1px solid var(--line);
+  border-radius: 12px;
+  color: inherit;
+  text-decoration: none;
+  transition:
+    border-color 0.15s,
+    box-shadow 0.15s;
+}
+
+.essay-pager-link.is-newer {
+  text-align: right;
+}
+
+.essay-pager-link:hover,
+.essay-pager-link:focus-visible {
+  border-color: rgb(122 224 255 / 0.55);
+  box-shadow: 0 0 18px rgb(122 224 255 / 0.12);
+  outline: none;
+}
+
+.essay-pager-dir {
+  font: 500 11px var(--font-display);
+  letter-spacing: 0.2em;
+  text-transform: uppercase;
+  color: var(--fg-muted);
+}
+
+.essay-pager-title {
+  font: 600 15px / 1.35 var(--font-display);
+  color: var(--fg);
+}
+
+.essay-all {
+  margin-top: 1.6em;
+}
+
+@media (max-width: 600px) {
+  .essay-pager {
+    grid-template-columns: 1fr;
+  }
+
+  .essay-pager-link.is-newer {
+    text-align: left;
+  }
+}
+
+/* --- reading progress ------------------------------------------------------------------ */
+
+.reading-progress {
+  --p: 0;
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  z-index: 30;
+  height: 16px;
+  pointer-events: none;
+}
+
+.reading-progress-track,
+.reading-progress-trail {
+  position: absolute;
+  top: 7px;
+  left: 0;
+  height: 2px;
+}
+
+.reading-progress-track {
+  right: 0;
+  background: rgb(122 224 255 / 0.12);
+}
+
+.reading-progress-trail {
+  width: calc(var(--p) * 100%);
+  background: linear-gradient(90deg, rgb(122 224 255 / 0.15), var(--accent));
+  box-shadow: 0 0 8px rgb(122 224 255 / 0.7);
+}
+
+.reading-progress-ship {
+  position: absolute;
+  top: 0;
+  left: clamp(0px, calc(var(--p) * 100% - 24px), calc(100% - 28px));
+  width: 28px;
+  height: 16px;
+  overflow: visible;
+  filter: drop-shadow(0 0 4px rgb(122 224 255 / 0.8));
+}
+
+.reading-progress-ship .hull {
+  fill: #eaf8ff;
+}
+
+.reading-progress-ship .canopy {
+  fill: var(--accent);
+}
+
+.reading-progress-ship .flame {
+  fill: var(--accent-warm);
+  opacity: 0.85;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .essay-item::before,
+  .essay-item h2 {
+    transition: none;
+  }
+
+  .essay-body li:focus,
+  .essay-body a[data-footnote-ref]:focus {
+    animation: none;
+  }
+}

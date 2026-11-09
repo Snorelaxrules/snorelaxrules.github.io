@@ -1,0 +1,30 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1600 900" role="img" aria-label="Placeholder cover: a ringed planet over a dark horizon">
+  <defs>
+    <radialGradient id="sky" cx="30%" cy="20%" r="90%">
+      <stop offset="0" stop-color="#1d3b8a"/>
+      <stop offset="0.55" stop-color="#0a1230"/>
+      <stop offset="1" stop-color="#04060d"/>
+    </radialGradient>
+    <radialGradient id="planet" cx="35%" cy="35%" r="70%">
+      <stop offset="0" stop-color="#ffd9a8"/>
+      <stop offset="0.5" stop-color="#e2814a"/>
+      <stop offset="1" stop-color="#3a1608"/>
+    </radialGradient>
+    <linearGradient id="ground" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0" stop-color="#0b1326"/>
+      <stop offset="1" stop-color="#02040a"/>
+    </linearGradient>
+  </defs>
+  <rect width="1600" height="900" fill="url(#sky)"/>
+  <g fill="#dfe7f5">
+    <circle cx="120" cy="90" r="2"/><circle cx="340" cy="210" r="1.4"/><circle cx="560" cy="70" r="1.8"/>
+    <circle cx="760" cy="160" r="1.2"/><circle cx="1010" cy="60" r="2.2"/><circle cx="1230" cy="140" r="1.4"/>
+    <circle cx="1420" cy="80" r="1.8"/><circle cx="1500" cy="260" r="1.2"/><circle cx="220" cy="330" r="1.2"/>
+    <circle cx="660" cy="300" r="1.6"/><circle cx="1320" cy="330" r="1.4"/><circle cx="900" cy="250" r="1"/>
+  </g>
+  <ellipse cx="1060" cy="400" rx="330" ry="58" fill="none" stroke="#ffb36b" stroke-opacity="0.35" stroke-width="10" transform="rotate(-12 1060 400)"/>
+  <circle cx="1060" cy="400" r="190" fill="url(#planet)"/>
+  <path d="M760 455 A330 58 -12 0 0 1380 330" fill="none" stroke="#ffb36b" stroke-opacity="0.6" stroke-width="10"/>
+  <path d="M0 720 C 300 650, 520 700, 800 680 S 1300 640, 1600 700 L1600 900 L0 900 Z" fill="url(#ground)"/>
+  <text x="80" y="840" fill="#8a97b0" font-family="sans-serif" font-size="30" letter-spacing="8">PLACEHOLDER COVER</text>
+</svg>

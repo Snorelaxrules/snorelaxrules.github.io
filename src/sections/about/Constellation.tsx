@@ -8,14 +8,15 @@ import { Photo } from './Photo'
  * Projected azimuthally around the north celestial pole and mirrored, as seen
  * looking up at the sky.
  */
-const STARS: { id: StarId; name: string; designation: string; ra: number; dec: number; mag: number }[] = [
+/** `label: 'left'` puts the name on the star's left, clear of lines leaving to the right. */
+const STARS: { id: StarId; name: string; designation: string; ra: number; dec: number; mag: number; label?: 'left' }[] = [
   { id: 'polaris', name: 'Polaris', designation: 'α Ursae Minoris', ra: 37.95, dec: 89.264, mag: 1.98 },
   { id: 'yildun', name: 'Yildun', designation: 'δ Ursae Minoris', ra: 263.05, dec: 86.586, mag: 4.36 },
   { id: 'epsilon', name: 'Epsilon', designation: 'ε Ursae Minoris', ra: 251.49, dec: 82.037, mag: 4.21 },
   { id: 'zeta', name: 'Zeta', designation: 'ζ Ursae Minoris', ra: 236.01, dec: 77.795, mag: 4.32 },
   { id: 'eta', name: 'Eta', designation: 'η Ursae Minoris', ra: 244.38, dec: 75.755, mag: 4.95 },
   { id: 'pherkad', name: 'Pherkad', designation: 'γ Ursae Minoris', ra: 230.18, dec: 71.834, mag: 3.05 },
-  { id: 'kochab', name: 'Kochab', designation: 'β Ursae Minoris', ra: 222.68, dec: 74.156, mag: 2.08 },
+  { id: 'kochab', name: 'Kochab', designation: 'β Ursae Minoris', ra: 222.68, dec: 74.156, mag: 2.08, label: 'left' },
 ]
 
 /** The Little Dipper: handle from Polaris, then the bowl ζ–η–γ–β–ζ. */
@@ -84,8 +85,12 @@ export function Constellation() {
 
   return (
     <div className="constellation">
+      <header className="constellation-head">
+        <h2>Hobbies</h2>
+        <p>Each star of Ursa Minor holds one. Select a star to read about it.</p>
+      </header>
       <div className="star-map">
-        <svg viewBox={layout.viewBox} role="group" aria-label="Ursa Minor. Each star is an interest; select one to read about it.">
+        <svg viewBox={layout.viewBox} role="group" aria-label="Hobbies as the stars of Ursa Minor. Each star is a hobby; select one to read about it.">
           <defs>
             <radialGradient id="star-glow">
               <stop offset="0" stopColor="#fff8ec" stopOpacity="0.9" />
@@ -154,7 +159,12 @@ export function Constellation() {
                 />
                 <circle cx={x} cy={y} r={r} className="star-core" />
                 <circle cx={x} cy={y} r={r * 2.6} className="star-ring" />
-                <text x={x + r * (anchor ? 2.6 : 1) + 0.45} y={y + 0.2} className="star-label">
+                <text
+                  x={s.label === 'left' ? x - r - 0.45 : x + r * (anchor ? 2.6 : 1) + 0.45}
+                  y={y + 0.2}
+                  textAnchor={s.label === 'left' ? 'end' : undefined}
+                  className="star-label"
+                >
                   {s.name}
                 </text>
               </g>
@@ -184,7 +194,7 @@ export function Constellation() {
             {star.id === 'polaris' && <p className="star-card-note">North star — everything else turns around this one.</p>}
           </motion.article>
         </AnimatePresence>
-        <p className="star-hint">Select a star · Polaris is the anchor</p>
+        <p className="star-hint">Select a star · Polaris is the main one</p>
       </div>
     </div>
   )

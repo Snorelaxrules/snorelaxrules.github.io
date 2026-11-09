@@ -4,7 +4,7 @@ import ComingSoon from './ComingSoon'
 import Contact from './Contact'
 import Lab from './Lab'
 import type { SectionProps } from './types'
-import Writing from './Writing'
+import Writing from './writing/Writing'
 
 /**
  * Cluster id → page component. A cluster in content/clusters.json without an
@@ -20,6 +20,6 @@ const sections: Record<string, ComponentType<SectionProps>> = {
 }
 
 /** Sections that use the wide page layout. */
-export const WIDE_SECTIONS = new Set(['about', 'map', 'lab'])
+export const WIDE_SECTIONS = new Set(['about', 'map', 'lab', 'writing'])
 
 export const sectionFor = (id: string) => sections[id] ?? ComingSoon

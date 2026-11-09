@@ -40,9 +40,11 @@ export function SecretPage() {
     >
       <div className="page-bar">
         <button ref={backRef} type="button" className="page-back" onClick={closeSecret}>
-          <span aria-hidden="true">←</span> Back to galaxy
+          <span className="page-back-arrow" aria-hidden="true">
+            ←
+          </span>{' '}
+          Back to galaxy
         </button>
-        <span className="page-bar-title">Gravitational anomaly</span>
       </div>
       <motion.main
         className="page-main"

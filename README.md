@@ -37,32 +37,66 @@ All text lives in `/content`. Edit it, commit, push. No component changes needed
 | `content/about/timeline.json` | About → Flight Path waypoints |
 | `content/about/interests.json` | About → Constellation: one interest per star |
 | `content/about/log/*.md` | About → Ship's Log entries |
-| `content/writing/*.md` | Blog posts |
+| `content/writing/*.md` | Writing: one essay per file |
 | `content/places.json` | Places on the map |
 | `content/projects.json` | Lab cards |
 | `content/contact.json` | Email, intro text, social links |
 | `content/clusters.json` | The galaxy map itself (see below) |
 | `content/secret.json` | The "Secret transmission" shown after finishing the hidden course |
 
-Static files (photo, résumé PDF, images used in posts) go in `/public` and are
+Static files (photo, résumé PDF, images used in essays) go in `/public` and are
 referenced from the site root, e.g. `public/Talus_Leong_Resume.pdf` → `/Talus_Leong_Resume.pdf`.
 
-### Add a post
+### Add an essay
 
-Create `content/writing/my-post.md`:
+Create `content/writing/my-essay.md`:
 
 ```md
 ---
-title: My post
+title: My essay
 date: 2026-11-04
-summary: One line shown in the list.
+summary: One or two sentences, shown in the list and under the title.
+cover: /writing/my-essay-cover.jpg
 ---
 
 Markdown body…
 ```
 
-The filename becomes the URL: `/#/writing/my-post`. Posts sort newest-first by `date`.
-Frontmatter supports simple `key: value` pairs and `key: [a, b]` lists.
+| Field | | |
+| --- | --- | --- |
+| `title` | required | Shown in the list and as the page heading. Quote it if it starts with `[` or contains `:`. |
+| `date` | required | `YYYY-MM-DD`. The list is newest first; Previous / Next follow the same order. |
+| `summary` | required | 1–2 sentences for the list and the line under the title. |
+| `cover` | optional | An image path (file in `public/`, e.g. `public/writing/…`) shown at the top of the essay. Leave it out for none; a missing file is simply skipped. |
+
+The filename becomes the URL: `content/writing/my-essay.md` → `/#/writing/my-essay`.
+Read time is words / 220, rounded up (code blocks don't count). Frontmatter
+supports simple `key: value` pairs and `key: [a, b]` lists.
+
+The body is GitHub-flavoured markdown. Use `##` and `###` for sections (the
+title is the page's only `#`; a `#` in the body is shown as `##`). Beyond the
+usual paragraphs, lists, links, `inline code`, code blocks, tables and `---`
+section breaks:
+
+- **Images with captions:** an image on its own line becomes a figure, and its
+  title becomes the caption: `![Alt text](/writing/photo.jpg "The caption")`.
+  Images load lazily; a missing file shows a small "Image unavailable" note.
+- **Footnotes:** `a claim.[^1]` in the text, then `[^1]: The note.` anywhere
+  (they're collected at the end under "Notes").
+- **Pull quotes:** a blockquote that starts with `[!pull]`:
+  `> [!pull] The line to highlight.` A plain `>` is a normal quote.
+- **Links:** `/about`, `/writing/other-essay` and other site paths stay in the
+  site; `https://` links open in a new tab.
+
+Readers get a progress line with a small ship at the top, a text-size menu
+(S / M / L, remembered per browser in `tl:reader-size`), Previous / Next
+links, and Esc to go back to the list. The two `placeholder-*.md` essays (and
+`public/writing/sample-*.svg`) are layout samples: delete them once real
+essays exist.
+
+Code: `src/content/writing.ts` (loading, read time, ordering) and
+`src/sections/writing/` (`Writing.tsx` routes, `EssayReader.tsx`,
+`EssayBody.tsx` markdown rendering, `ReadingProgress.tsx`, `writing.css`).
 
 ### About page
 
@@ -191,7 +225,9 @@ Append to `content/places.json`:
 ## The gravitational anomaly (hidden course)
 
 Fly off the right edge of the galaxy map. A warm glow on the right horizon and
-a "Gravitational anomaly" sign point the way. Fly through the START gate to get
+a "Gravitational anomaly" sign point the way. Crossing into the course puts the
+ship at rest in front of the START gate (no drifting in on galaxy momentum), and
+the on-screen "Return to galaxy" button or Esc takes you back. Fly through the gate to get
 a 3-2-1 countdown, then pass the six rings in order (the next one pulses amber,
 passed ones turn green), slingshotting around three black holes and five
 planets, and dive into the wormhole. That opens the Secret transmission.

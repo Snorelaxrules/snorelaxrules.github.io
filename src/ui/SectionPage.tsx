@@ -34,9 +34,11 @@ export function SectionPage({ cluster }: { cluster: ClusterConfig }) {
     >
       <div className="page-bar">
         <button ref={backRef} type="button" className="page-back" onClick={() => navigate('/')}>
-          <span aria-hidden="true">←</span> Back to galaxy
+          <span className="page-back-arrow" aria-hidden="true">
+            ←
+          </span>{' '}
+          Back to galaxy
         </button>
-        <span className="page-bar-title">{cluster.label}</span>
       </div>
       <motion.main
         className={`page-main${WIDE_SECTIONS.has(cluster.id) ? ' is-wide' : ''}`}
