@@ -1,14 +1,12 @@
 ---
 title: What Does It Mean to Care?
 date: 2026-11-11
-summary: The nuanced art of taking care of youself and others. On listening and turning care back on yourself.
+summary: A personal reflection on the nuanced art of caring. On listening, caring for others, and turning care back on yourself.
 ---
 
 Recently, around midnight, I trudged up the slope with a close friend and we sat on a little bench near Uris, where I listened to him talk about life: how grateful he was that everything had lined up to bring him here, how much the side quests mattered to him, but also how he had been living day to day. At some point, he turned to me and asked, “what about you?” I didn’t know where to start. I looked up at the night sky for guidance but found only pitch blackness. There were no stars in the sky.
 
 ![Lower Manhattan at dusk from the Brooklyn Bridge, a small plush figure in the foreground](/writing/care.jpg)
-
----
 
 I’m usually the one asking that question, not answering it. Sometimes I wonder whether I was born emotionally perceptive or grew into it. Either way, by high school I found that I was good at reading the emotional states of those around me. I was often the first to notice a troubled expression or slightly off behavior, and to offer an ear or my company. As a result, people confided in me.
 
@@ -26,8 +24,6 @@ Lately, I’ve had to admit something uncomfortable: while I still find joy in h
 
 > [!pull] I’ve gone around patching the boats of those sinking around me, fully aware that I was pulling planks from that of my own.
 
----
-
 I know comparison makes no sense here, but next to the problems people bring me, my doubts feel small, and self-made. So I don’t bring them up. There’s no point adding weight to someone already drowning.
 
 On certain nights, I find myself wondering: how do you expect to shoulder the burden of others if you can’t even fathom the mess you’ve put yourself in? It’s a convincing argument, and it keeps me quiet. Which means the rescue crew I’ve given up on has never actually been told there’s a boat to look for. So when my friend asked, “what about you?”, I had nothing prepared, because I’d spent so long making sure no one would need to ask.
@@ -35,6 +31,8 @@ On certain nights, I find myself wondering: how do you expect to shoulder the bu
 Still, I believe that only you can save yourself. Looking back, I know the reason every person I helped made it through is that they pulled themselves out of the water. I threw a rope, but they did the climbing.
 
 So if no rescue crew is coming, I’ll be my own. I am not without resources: I’ve spent years watching people find their way back to shore, and if anyone is capable of getting out of this, it’s me. If my friend asked again on that slope, I’d tell him that I’m confused and conflicted, but I have faith in myself to work it out.
+
+---
 
 So, what does it mean to care? I used to think it meant giving until nothing was left. Now I think it’s smaller, and harder.
 

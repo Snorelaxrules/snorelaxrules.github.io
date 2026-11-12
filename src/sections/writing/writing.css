@@ -447,6 +447,17 @@
   letter-spacing: 0.9em;
 }
 
+/* a small break inside a section: a line with just ✦ in the markdown */
+.essay-body hr.is-small {
+  margin: 1.5em 0;
+}
+
+.essay-body hr.is-small::after {
+  content: '✦';
+  letter-spacing: 0;
+  color: rgb(255 179 107 / 0.5);
+}
+
 .essay-figure {
   margin: 2em 0;
 }

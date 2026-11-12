@@ -89,6 +89,9 @@ const components: Components = {
     // a paragraph holding only images is a figure (a caption comes from the image title)
     p: ({ node, children, ...props }) => {
         const kids = node?.children.filter((c) => !isBlank(c)) ?? [];
+        // a paragraph that is just "✦" is a small break, lighter than ---
+        if (kids.length === 1 && kids[0].type === "text" && kids[0].value.trim() === "✦")
+            return <hr className="is-small" />;
         if (
             kids.length > 0 &&
             kids.every((c) => c.type === "element" && c.tagName === "img")
