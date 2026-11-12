@@ -7,12 +7,12 @@ export default defineConfig({
   base: '/',
   plugins: [react()],
   build: {
-    // three.js core alone is ~700 kB minified; everything else is well under this
-    chunkSizeWarningLimit: 800,
+    // the lazy Map chunk (MapLibre) is ~1.1 MB minified, three.js core ~700 kB
+    chunkSizeWarningLimit: 1200,
     rolldownOptions: {
       output: {
         // Long-lived vendor chunks cache across deploys; site code changes often.
-        // d3/topojson/world-atlas are deliberately not listed: they stay in the lazy Map chunk.
+        // maplibre-gl is deliberately not listed: it stays in the lazy Map chunk.
         codeSplitting: {
           groups: [
             { name: 'three', test: /node_modules[\\/]three[\\/]/, priority: 30 },

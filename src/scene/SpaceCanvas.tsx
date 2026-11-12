@@ -12,12 +12,15 @@ import { ViewPan } from './ViewPan'
 import { SkyDome } from './SkyDome'
 import { WarpField } from './WarpField'
 
+const PAUSING_SECTIONS = new Set(['about', 'map'])
+
 /** The one persistent WebGL canvas. Everything else layers over it as DOM. */
 export function SpaceCanvas() {
-  // About runs its own 3D stage, so pause this loop while it's open. Keyed on
-  // activeId too: leaving About must resume rendering immediately, or the camera
-  // rig (which runs in this loop) could never start the flight home.
-  const paused = useGalaxy((s) => s.activeId === 'about' && s.docked === 'about')
+  // About (its own 3D stage) and Map (a MapLibre WebGL map) cover the scene, so
+  // pause this loop while either is open. Keyed on activeId too: leaving must
+  // resume rendering immediately, or the camera rig (which runs in this loop)
+  // could never start the flight home.
+  const paused = useGalaxy((s) => PAUSING_SECTIONS.has(s.activeId ?? '') && s.docked === s.activeId)
   return (
     <div className="space-canvas" aria-hidden="true">
       <Canvas

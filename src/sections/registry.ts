@@ -13,7 +13,7 @@ import Writing from './writing/Writing'
 const sections: Record<string, ComponentType<SectionProps>> = {
   about: About,
   writing: Writing,
-  // d3 + the world outline only load when someone visits the map
+  // MapLibre only loads when someone visits the map
   map: lazy(() => import('./MapSection')),
   lab: Lab,
   contact: Contact,

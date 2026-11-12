@@ -4,7 +4,7 @@ Personal site of Talus Leong. Visitors start in a spaceship cockpit, jump to
 hyperspace, and arrive at a galaxy map. Each section is a procedurally
 generated star cluster you can fly into.
 
-Vite · React · TypeScript · React Three Fiber · Motion · d3-geo. Hosted on GitHub Pages.
+Vite · React · TypeScript · React Three Fiber · Motion · MapLibre GL. Hosted on GitHub Pages.
 
 ## Running it
 
@@ -15,6 +15,7 @@ npm run build     # type-check + production build into dist/
 npm run preview   # serve the production build
 npm run lint
 npm test          # unit tests (Vitest): game rules, kicks, handling
+npm run images    # resize place photos (see "Add a place")
 ```
 
 Every push to `main` builds and deploys via `.github/workflows/deploy.yml`.
@@ -175,11 +176,99 @@ Markdown body…
 
 ### Add a place
 
-Append to `content/places.json`:
+Each place gets a star on the Map globe and a row in the list. Hovering a
+star turns the globe to it; clicking opens its date, note and a photo carousel
+on the right (clicking a photo opens it full screen). The slug is the photo
+folder name. Photos must go in `content/places-originals/<slug>/`, not
+`content/places/<slug>/`: that folder is the script's output, and anything
+put there by hand is neither processed nor read for GPS.
 
-```json
-{ "name": "Kyoto, Japan", "lat": 35.0116, "lng": 135.7681, "date": "Apr 2025", "note": "Temples at dawn." }
-```
+1. **Put the original photos** in `content/places-originals/<slug>/`. This folder
+   is gitignored, so full-size originals never get committed.
+2. **Run `npm run images`.** It writes resized WebP copies to
+   `content/places/<slug>/`: `<name>.webp` (1600px long edge, quality 80) and
+   `<name>.thumb.webp` (300px). EXIF data, GPS location included, is stripped,
+   and phone rotation is applied first. Photos that already have up-to-date
+   copies are skipped, so it's safe to rerun. Before stripping, it reads each
+   photo's GPS position into `content/places/gps.json` (rounded to about
+   10 m), so you don't have to look up coordinates. JPGs exported from HEIC
+   keep their location as long as the export didn't remove it; on a Mac,
+   check "Include location information" when exporting from Photos.
+3. **Add the entry** to `content/places.json`. `photos[].file` is the
+   original's filename; the site finds the matching `.webp`:
+
+   ```json
+   {
+     "slug": "kauai",
+     "name": "Kauaʻi, Hawaii",
+     "date": "Jun 2025",
+     "note": "A week on the Garden Isle.",
+     "photos": [
+       { "file": "IMG_0412.jpg", "spot": "Waimea Canyon", "caption": "Red dirt and mist." },
+       { "file": "IMG_0450.jpg", "spot": "Hanalei Bay" },
+       { "file": "IMG_0501.jpg", "spot": "Nā Pali Coast", "lat": 22.17, "lng": -159.64 }
+     ]
+   }
+   ```
+
+   **One star, many spots.** The globe shows a single star per place. When
+   it's open, the globe zooms in to the area the photos cover, shows a small
+   star at each photo's location, and follows along as you move through the
+   carousel; clicking a small star jumps to its photo. `spot` names the
+   location, shown above the caption. Positions come from the photo's GPS,
+   and `lat`/`lng` on a photo override that.
+
+   A place's own `lat`/`lng` is optional when its photos have positions: the
+   star then sits in the middle of them. Give it a `lat`/`lng` when the
+   place has no located photos (or to place the star yourself).
+
+4. **Commit** `content/places.json`, `content/places/gps.json` and
+   `content/places/<slug>/`.
+
+Notes:
+
+- `photos: []` shows just the note, and a single photo shows no arrows or
+  thumbnails.
+- Alt text is the photo's caption, or the place name when there is no caption.
+- A photo listed in the JSON whose WebP doesn't exist yet shows "Photo
+  unavailable" instead of a broken image.
+- Order in the list follows the JSON.
+- Arrow keys flip photos while the carousel has focus. In the lightbox, Esc
+  closes just the lightbox.
+- The `[Sample]` places are placeholders. Delete them from `places.json` and
+  delete `content/places/sample-*`.
+
+### Map basemap
+
+The Map section is a [MapLibre GL JS](https://maplibre.org/) map with the
+globe projection: a 3D globe zoomed out, a detailed flat map zoomed in.
+
+- **Tiles:** vector tiles from [OpenFreeMap](https://openfreemap.org) (free,
+  no API key or account) in the OpenMapTiles schema. The URL is `TILES_URL`
+  in `src/sections/map/mapStyle.ts`; any OpenMapTiles-schema TileJSON works
+  there (e.g. MapTiler, or self-hosted tiles), with `GLYPHS_URL` pointing at
+  a server that has the label fonts named in `FONT_REGULAR`/`FONT_BOLD`.
+- **Style:** `mapStyle` in the same file is a hand-written MapLibre style.
+  `PALETTE` holds every colour (land, water, coastline, borders, roads,
+  labels, horizon); the `layers` list decides what is drawn and from which
+  zoom: country borders always, state borders from 3, cities from 3.5,
+  major roads from 6, rivers from 8, towns from 8 and minor roads from 12.
+  Remove a layer to hide that feature; tweak `minzoom`/`filter` to change
+  when it appears. The `sky` block controls the atmosphere glow at the
+  globe's edge (it fades out as the map flattens).
+- **Attribution:** required by OpenFreeMap and OpenStreetMap; it sits in the
+  compact control at the bottom right of the map. Keep it if you change the
+  style; update `ATTRIBUTION` if you change the tile source.
+- **Space around the globe:** the map canvas is transparent outside the globe;
+  the starfield behind it is CSS on `.map-view` in `src/sections/map/map.css`,
+  as are the star markers (`.map-star`).
+- **Camera:** `src/sections/map/MapView.tsx`. The zoomed-out globe fills
+  `GLOBE_FILL` of the box; an open place frames all its photo spots (up to
+  `MAX_PLACE_ZOOM`); one spot uses `SINGLE_SPOT_ZOOM`, none `PLACE_ZOOM`.
+- **Performance:** MapLibre is only in the lazy Map chunk, so it downloads
+  the first time someone opens Map. The map and its WebGL context are
+  removed when the section closes, and the galaxy scene stops rendering
+  while Map (or About) is open.
 
 ### Add a cluster (a new section)
 
@@ -334,4 +423,4 @@ Code: `engine.ts` (pure game logic), `pieces.ts` (shapes, kick tables),
 - **Adaptive resolution:** the canvas steps its pixel ratio down on slow GPUs and drops to 1× while a page covers the scene.
 - **WebGL fallback:** if WebGL is unavailable or the scene crashes, the site shows a static starfield and stays fully navigable.
 - **One render loop at a time:** while About is open, the galaxy canvas pauses (it holds its last frame behind the blur). Planet Scan's own canvas mounts only on that tab, with the pixel ratio capped at 1.5×.
-- **Bundles:** vendor chunks (three, r3f, react, motion) are split for caching. The Map section (d3 + world outline) is lazy-loaded.
+- **Bundles:** vendor chunks (three, r3f, react, motion) are split for caching. The Map section (MapLibre) is lazy-loaded.

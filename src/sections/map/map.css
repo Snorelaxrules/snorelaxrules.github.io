@@ -1,0 +1,541 @@
+/* --- place photos: carousel under the place details, plus a lightbox ------------ */
+
+.lightbox-close {
+  position: fixed;
+  top: 18px;
+  right: 18px;
+  z-index: 1;
+  display: grid;
+  width: 40px;
+  height: 40px;
+  place-items: center;
+  padding: 0;
+  border: 1px solid var(--line);
+  border-radius: 50%;
+  background: rgb(255 255 255 / 0.04);
+  color: var(--fg);
+  font-size: 22px;
+  line-height: 1;
+  cursor: pointer;
+}
+
+.lightbox-close:hover,
+.lightbox-close:focus-visible {
+  border-color: var(--accent);
+  color: var(--accent);
+}
+
+/* --- carousel --------------------------------------------------------------------- */
+
+.carousel-stage {
+  position: relative;
+}
+
+.carousel-main {
+  display: block;
+  width: 100%;
+  padding: 0;
+  overflow: hidden;
+  aspect-ratio: 4 / 3;
+  border: 1px solid var(--line);
+  border-radius: 12px;
+  background: #050812;
+  cursor: zoom-in;
+}
+
+.carousel-main:focus-visible {
+  outline: 2px solid var(--accent);
+  outline-offset: 2px;
+}
+
+.carousel-img,
+.lightbox-img {
+  display: block;
+  width: 100%;
+  height: 100%;
+  object-fit: contain;
+  opacity: 0;
+  transition: opacity 0.3s;
+}
+
+.carousel-img.is-loaded,
+.lightbox-img.is-loaded {
+  opacity: 1;
+}
+
+.carousel-img.is-missing,
+.lightbox-img.is-missing {
+  display: grid;
+  place-items: center;
+  opacity: 1;
+  color: var(--fg);
+  font: 500 12px var(--font-display);
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+}
+
+.carousel-img.is-missing span,
+.lightbox-img.is-missing span {
+  opacity: 0.5;
+}
+
+.carousel-arrow {
+  position: absolute;
+  top: 50%;
+  display: grid;
+  width: 34px;
+  height: 34px;
+  place-items: center;
+  padding: 0 0 3px;
+  translate: 0 -50%;
+  border: 1px solid rgb(255 255 255 / 0.18);
+  border-radius: 50%;
+  background: rgb(8 11 21 / 0.75);
+  color: #fff;
+  font-size: 24px;
+  line-height: 1;
+  cursor: pointer;
+  transition:
+    background 0.15s,
+    border-color 0.15s;
+}
+
+.carousel-arrow.is-prev {
+  left: 8px;
+}
+
+.carousel-arrow.is-next {
+  right: 8px;
+}
+
+.carousel-arrow:hover,
+.carousel-arrow:focus-visible {
+  border-color: var(--accent);
+  background: rgb(8 11 21 / 0.95);
+  color: var(--accent);
+}
+
+.carousel-arrow.is-large {
+  position: fixed;
+  width: 48px;
+  height: 48px;
+  font-size: 32px;
+}
+
+.carousel-arrow.is-large.is-prev {
+  left: 20px;
+}
+
+.carousel-arrow.is-large.is-next {
+  right: 20px;
+}
+
+.carousel-caption {
+  display: flex;
+  justify-content: space-between;
+  gap: 12px;
+  min-height: 1.5em;
+  margin: 10px 2px 0;
+  font-size: 0.92rem;
+  line-height: 1.5;
+  opacity: 0.85;
+}
+
+.carousel-count {
+  flex: none;
+  margin-left: auto;
+  color: var(--accent-warm);
+  font: 500 11px var(--font-display);
+  letter-spacing: 0.14em;
+  line-height: 1.9;
+}
+
+.carousel-thumbs {
+  display: flex;
+  gap: 8px;
+  margin-top: 12px;
+  padding: 2px 2px 6px;
+  overflow-x: auto;
+  scrollbar-width: thin;
+}
+
+.carousel-thumb {
+  flex: none;
+  display: grid;
+  width: 64px;
+  aspect-ratio: 1;
+  place-items: center;
+  padding: 0;
+  overflow: hidden;
+  border: 1px solid var(--line);
+  border-radius: 8px;
+  background: #050812;
+  color: var(--fg);
+  opacity: 0.55;
+  cursor: pointer;
+  transition:
+    opacity 0.15s,
+    border-color 0.15s;
+}
+
+.carousel-thumb img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
+.carousel-thumb:hover,
+.carousel-thumb:focus-visible {
+  opacity: 0.9;
+}
+
+.carousel-thumb[aria-current='true'] {
+  border-color: var(--accent-warm);
+  opacity: 1;
+}
+
+/* --- lightbox --------------------------------------------------------------------- */
+
+.lightbox {
+  position: fixed;
+  inset: 0;
+  z-index: 100;
+  padding: 64px 84px 28px;
+  background: rgb(3 5 12 / 0.94);
+  animation: lightbox-in 0.2s ease-out;
+}
+
+@keyframes lightbox-in {
+  from {
+    opacity: 0;
+  }
+}
+
+.lightbox-figure {
+  display: grid;
+  grid-template-rows: minmax(0, 1fr) auto;
+  width: 100%;
+  height: 100%;
+  margin: 0;
+  gap: 12px;
+}
+
+.lightbox-img {
+  min-height: 0;
+}
+
+.lightbox-figure figcaption {
+  display: flex;
+  justify-content: center;
+  gap: 16px;
+  color: var(--fg);
+  font-size: 0.95rem;
+}
+
+.lightbox-figure figcaption .carousel-count {
+  margin-left: 0;
+}
+
+
+@media (max-width: 720px) {
+  .lightbox {
+    padding: 60px 8px 24px;
+  }
+
+  .carousel-arrow.is-large {
+    top: auto;
+    bottom: 18px;
+    translate: none;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .lightbox {
+    animation: none;
+  }
+
+  .carousel-img,
+  .lightbox-img {
+    transition: none;
+  }
+}
+
+/* --- opened place in the right column ------------------------------------------- */
+
+.place-open {
+  animation: place-open-in 0.3s ease-out;
+}
+
+@keyframes place-open-in {
+  from {
+    opacity: 0;
+    transform: translateX(12px);
+  }
+}
+
+.place-open h2 {
+  margin: 4px 0 8px;
+  font-size: 1.5rem;
+}
+
+.place-open-note {
+  margin: 0;
+  line-height: 1.6;
+  opacity: 0.85;
+}
+
+.place-open .carousel {
+  margin-top: 18px;
+}
+
+.place-open-back {
+  display: inline-flex;
+  gap: 8px;
+  margin-bottom: 18px;
+  padding: 7px 14px;
+  border: 1px solid var(--line);
+  border-radius: 999px;
+  background: none;
+  color: var(--fg);
+  font: 500 12px var(--font-display);
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+  cursor: pointer;
+}
+
+.place-open-back:hover,
+.place-open-back:focus-visible {
+  border-color: var(--accent);
+  color: var(--accent);
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .place-open {
+    animation: none;
+  }
+}
+
+/* --- photo spots: kicker in captions ---------------------------------------------- */
+
+.carousel-spot {
+  display: block;
+  margin-bottom: 2px;
+  color: var(--accent-warm);
+  font: 500 11px var(--font-display);
+  letter-spacing: 0.16em;
+  text-transform: uppercase;
+}
+
+.lightbox-figure figcaption .carousel-spot {
+  display: inline;
+  margin: 0 10px 0 0;
+}
+
+/* --- spot chips: the open place's subsections ------------------------------------- */
+
+.place-spots {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+  margin-top: 16px;
+}
+
+.place-spot {
+  padding: 5px 12px;
+  border: 1px solid var(--line);
+  border-radius: 999px;
+  background: none;
+  color: var(--fg);
+  font: 500 11px var(--font-display);
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  opacity: 0.75;
+  cursor: pointer;
+  transition:
+    opacity 0.15s,
+    border-color 0.15s,
+    color 0.15s;
+}
+
+.place-spot:hover,
+.place-spot:focus-visible {
+  opacity: 1;
+  border-color: var(--accent);
+}
+
+.place-spot[aria-current='true'] {
+  opacity: 1;
+  border-color: rgb(255 179 107 / 0.6);
+  background: rgb(255 179 107 / 0.08);
+  color: var(--accent-warm);
+}
+
+/* --- MapLibre map: starfield, stars, attribution ------------------------------------ */
+
+.map-view {
+  position: relative;
+  width: 100%;
+  aspect-ratio: 1;
+  max-height: 560px;
+  overflow: hidden;
+  border-radius: 18px;
+  /* a few layers of tiny stars behind the transparent space around the globe */
+  background:
+    radial-gradient(1px 1px at 12% 18%, rgb(255 255 255 / 0.7), transparent 60%),
+    radial-gradient(1px 1px at 78% 12%, rgb(255 255 255 / 0.55), transparent 60%),
+    radial-gradient(1.2px 1.2px at 64% 84%, rgb(255 246 230 / 0.7), transparent 60%),
+    radial-gradient(1px 1px at 28% 72%, rgb(255 255 255 / 0.45), transparent 60%),
+    radial-gradient(1px 1px at 90% 58%, rgb(122 224 255 / 0.6), transparent 60%),
+    radial-gradient(1px 1px at 46% 6%, rgb(255 255 255 / 0.5), transparent 60%),
+    radial-gradient(1.2px 1.2px at 6% 90%, rgb(255 255 255 / 0.6), transparent 60%),
+    radial-gradient(1px 1px at 96% 30%, rgb(255 255 255 / 0.4), transparent 60%),
+    radial-gradient(ellipse at 50% 50%, rgb(58 168 216 / 0.1), transparent 62%),
+    #02040a;
+  background-size:
+    180px 180px,
+    230px 230px,
+    260px 260px,
+    150px 150px,
+    310px 310px,
+    200px 200px,
+    270px 270px,
+    170px 170px,
+    100% 100%,
+    100% 100%;
+}
+
+.map-canvas {
+  position: absolute;
+  inset: 0;
+}
+
+.map-canvas .maplibregl-canvas {
+  outline: none;
+}
+
+.map-canvas .maplibregl-canvas:focus-visible {
+  outline: 2px solid var(--accent);
+  outline-offset: -2px;
+}
+
+/* place stars and photo spots (DOM markers, so they are real buttons) */
+.map-star {
+  /* MapLibre positions markers absolutely; this must not override it */
+  position: absolute;
+  width: 28px;
+  height: 28px;
+  padding: 0;
+  border: 0;
+  background: none;
+  cursor: pointer;
+}
+
+.map-star span {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  border-radius: 50%;
+  translate: -50% -50%;
+  pointer-events: none;
+}
+
+.map-star-glow {
+  width: 28px;
+  height: 28px;
+  background: radial-gradient(circle, #fff6e6 0, rgb(255 179 107 / 0.8) 25%, rgb(255 179 107 / 0) 70%);
+  animation: star-twinkle 3s ease-in-out infinite;
+}
+
+.map-star-core {
+  width: 5px;
+  height: 5px;
+  background: #fffaf0;
+}
+
+.map-star-ring {
+  width: 18px;
+  height: 18px;
+  border: 1px solid var(--accent-warm);
+  opacity: 0;
+  transition: opacity 0.2s;
+}
+
+.map-star:hover .map-star-ring,
+.map-star.is-selected .map-star-ring,
+.map-star.is-active .map-star-ring {
+  opacity: 0.95;
+}
+
+.map-star.is-selected .map-star-glow {
+  animation: none;
+  scale: 1.35;
+}
+
+.map-star:focus-visible {
+  outline: none;
+}
+
+.map-star:focus-visible .map-star-ring {
+  opacity: 1;
+  border-color: var(--accent);
+  border-width: 2px;
+}
+
+.map-star.is-hidden {
+  visibility: hidden;
+}
+
+.map-star.is-spot {
+  width: 22px;
+  height: 22px;
+}
+
+.map-star.is-spot .map-star-glow {
+  width: 18px;
+  height: 18px;
+  opacity: 0.6;
+  animation: none;
+}
+
+.map-star.is-spot .map-star-ring {
+  width: 14px;
+  height: 14px;
+}
+
+.map-star.is-spot.is-active .map-star-glow {
+  opacity: 1;
+  scale: 1.3;
+}
+
+@keyframes star-twinkle {
+  50% {
+    opacity: 0.6;
+  }
+}
+
+/* attribution: required, kept small and quiet */
+.map-canvas .maplibregl-ctrl-attrib {
+  background: rgb(3 5 11 / 0.6);
+  color: rgb(159 176 207 / 0.7);
+  font: 10px var(--font-body);
+}
+
+.map-canvas .maplibregl-ctrl-attrib a {
+  color: inherit;
+}
+
+.map-canvas .maplibregl-ctrl-attrib.maplibregl-compact {
+  margin: 0 8px 8px 0;
+  border-radius: 12px;
+}
+
+.map-canvas .maplibregl-ctrl-attrib-button {
+  filter: invert(0.85) hue-rotate(180deg);
+  opacity: 0.55;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .map-star-glow {
+    animation: none;
+  }
+}

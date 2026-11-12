@@ -1,11 +1,116 @@
 {
-  "$comment": "Places on the Map page. lat/lng in decimal degrees; date is free-form text.",
-  "places": [
-    { "name": "Ithaca, NY", "lat": 42.444, "lng": -76.5019, "date": "2023 – now", "note": "Placeholder — edit content/places.json." },
-    { "name": "Reykjavík, Iceland", "lat": 64.1466, "lng": -21.9426, "date": "Mar 2024", "note": "Chased the aurora; mostly found clouds." },
-    { "name": "Kyoto, Japan", "lat": 35.0116, "lng": 135.7681, "date": "Apr 2025", "note": "Temples at dawn, before the crowds." },
-    { "name": "Lisbon, Portugal", "lat": 38.7223, "lng": -9.1393, "date": "Jul 2025", "note": "Hills, trams, and too many pastéis de nata." },
-    { "name": "Cape Town, South Africa", "lat": -33.9249, "lng": 18.4241, "date": "Jan 2026", "note": "Table Mountain in the clouds." },
-    { "name": "Patagonia, Chile", "lat": -50.9423, "lng": -73.4068, "date": "Feb 2026", "note": "Wind like nowhere else." }
-  ]
+    "$comment": "Places on the Map page. slug is the URL (/map/<slug>) and the photo folder name. lat/lng in decimal degrees; date is free-form text. photos[].file is the original's filename in content/places-originals/<slug>/; run `npm run images` to make the served WebP copies.",
+    "places": [
+        {
+            "slug": "ithaca",
+            "name": "Ithaca, NY",
+            "lat": 42.444,
+            "lng": -76.5019,
+            "date": "2023 – now",
+            "note": "Placeholder — edit content/places.json.",
+            "photos": []
+        },
+        {
+            "slug": "singapore",
+            "name": "Singapore, Singapore",
+            "date": "Present",
+            "note": "One of my homes.",
+            "photos": [
+                { "file": "singapore1.jpg" },
+                { "file": "singapore2.jpg" },
+                { "file": "singapore3.jpg" },
+                { "file": "singapore4.jpg" }
+            ]
+        },
+        {
+            "slug": "sample-lakeside",
+            "name": "[Sample] Seneca Lake",
+            "date": "Sep 2025",
+            "note": "Sample place with photos at three spots along the lake (no lat/lng of its own: the star sits in the middle of them), plus one missing file to show the fallback. Delete it from content/places.json and content/places/.",
+            "photos": [
+                {
+                    "file": "shore.jpg",
+                    "spot": "Geneva",
+                    "lat": 42.868,
+                    "lng": -76.977,
+                    "caption": "Placeholder: a wide landscape photo."
+                },
+                {
+                    "file": "dock.jpg",
+                    "spot": "Lodi Point",
+                    "lat": 42.613,
+                    "lng": -76.874,
+                    "caption": "Placeholder: a tall portrait photo."
+                },
+                {
+                    "file": "sunset.jpg",
+                    "spot": "Watkins Glen",
+                    "lat": 42.38,
+                    "lng": -76.87
+                },
+                {
+                    "file": "not-processed-yet.jpg",
+                    "caption": "This file doesn't exist, on purpose."
+                }
+            ]
+        },
+        {
+            "slug": "tokyo",
+            "name": "Tokyo, Japan",
+            "date": "Jul 2023",
+            "note": "Will be back for more spots!!",
+            "photos": [
+                {
+                    "file": "tokyo1.jpg"
+                }
+            ]
+        },
+        {
+            "slug": "japan",
+            "name": "Japan",
+            "date": "Jul 2023",
+            "note": "Spent some time watching clouds in the mountains.",
+            "photos": [
+                { "file": "japan1.jpg" },
+                { "file": "japan2.jpg" },
+                { "file": "japan3.jpg" },
+                { "file": "japan4.jpg" },
+                { "file": "japan5.jpg" },
+                { "file": "japan6.jpg" },
+                { "file": "japan7.jpg" }
+            ]
+        },
+        {
+            "slug": "hikone",
+            "name": "Hikone, Japan",
+            "date": "Jul 2023",
+            "note": "Home to the iconic Hikone Castle.",
+            "photos": [{ "file": "hikone1.jpg" }, { "file": "hikone2.jpg" }]
+        },
+        {
+            "slug": "atlanta",
+            "name": "Atlanta, Georgia",
+            "date": "Jun 2023",
+            "note": "My first NLC!",
+            "photos": [{ "file": "atlanta1.jpg" }, { "file": "atlanta2.jpg" }]
+        },
+        {
+            "slug": "sacramento",
+            "name": "Sacramento, California",
+            "date": "Apr 2023",
+            "note": "My first SLC!",
+            "photos": [{ "file": "sacramento1.jpg" }, { "file": "sacramento2.jpg" }]
+        },
+        {
+            "slug": "hawaii",
+            "name": "Hawaii, USA",
+            "date": "Dec 2022",
+            "note": "Some of the nicest waves out there.",
+            "photos": [
+                { "file": "hawaii1.jpg" },
+                { "file": "hawaii2.jpg" },
+                { "file": "hawaii3.jpg" }
+            ]
+        }
+    ]
 }

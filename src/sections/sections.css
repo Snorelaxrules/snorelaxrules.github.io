@@ -5,7 +5,7 @@
 }
 
 .section-header {
-  margin: 24px 0 48px;
+  margin: 0 0 36px;
 }
 
 .section-kicker {
@@ -314,52 +314,7 @@
   display: grid;
   gap: 20px;
   justify-items: center;
-}
-
-.globe {
-  width: 100%;
-  display: flex;
-  justify-content: center;
-}
-
-.globe svg {
-  cursor: grab;
-  touch-action: none;
-  user-select: none;
-}
-
-.globe svg:active {
-  cursor: grabbing;
-}
-
-.globe-marker {
-  cursor: pointer;
-}
-
-.globe-marker-glow {
-  animation: star-twinkle 3s ease-in-out infinite;
-}
-
-.globe-marker-ring {
-  opacity: 0;
-  transition: opacity 0.2s;
-}
-
-.globe-marker.is-selected .globe-marker-ring,
-.globe-marker:hover .globe-marker-ring {
-  opacity: 0.9;
-}
-
-@keyframes star-twinkle {
-  50% {
-    opacity: 0.6;
-  }
-}
-
-@media (prefers-reduced-motion: reduce) {
-  .globe-marker-glow {
-    animation: none;
-  }
+  min-width: 0;
 }
 
 .map-detail {
