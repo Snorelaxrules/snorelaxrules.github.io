@@ -4,7 +4,7 @@ import type { ExpressionSpecification, StyleSpecification } from 'maplibre-gl'
  * The Map section's basemap: OpenFreeMap vector tiles (OpenMapTiles schema,
  * free, no key or account) drawn with a custom dark style to match the site.
  * Every colour lives in PALETTE; the layer list below only decides what is
- * drawn and from which zoom. See README "Map basemap".
+ * drawn and from which zoom. See docs/DEVELOPING.md "Map basemap".
  */
 
 /** TileJSON for the whole planet. Swap for another OpenMapTiles-schema source if needed. */
