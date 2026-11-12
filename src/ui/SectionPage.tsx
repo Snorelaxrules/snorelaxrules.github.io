@@ -2,7 +2,7 @@ import { motion } from "motion/react";
 import { Suspense, createElement, useEffect, useRef } from "react";
 import { useLocation, useNavigate } from "react-router";
 import type { ClusterConfig } from "../content/clusters";
-import { WIDE_SECTIONS, sectionFor } from "../sections/registry";
+import { NESTED_BACK, WIDE_SECTIONS, sectionFor } from "../sections/registry";
 import "../sections/sections.css";
 
 /**
@@ -14,6 +14,10 @@ export function SectionPage({ cluster }: { cluster: ClusterConfig }) {
     const { pathname } = useLocation();
     const scrollRef = useRef<HTMLDivElement>(null);
     const backRef = useRef<HTMLButtonElement>(null);
+    // on a sub-page of a nested section (an essay), back goes up one level
+    const nestedBack = pathname.startsWith(`${cluster.route}/`)
+        ? NESTED_BACK[cluster.id]
+        : undefined;
 
     useEffect(() => {
         // move focus into the page without flashing a focus ring for pointer users
@@ -40,12 +44,12 @@ export function SectionPage({ cluster }: { cluster: ClusterConfig }) {
                     ref={backRef}
                     type="button"
                     className="page-back"
-                    onClick={() => navigate("/")}
+                    onClick={() => navigate(nestedBack ? cluster.route : "/")}
                 >
                     <span className="page-back-arrow" aria-hidden="true">
                         ←
                     </span>{" "}
-                    Back to galaxy
+                    {nestedBack ?? "Back to galaxy"}
                 </button>
             </div>
             <motion.main

@@ -22,4 +22,11 @@ const sections: Record<string, ComponentType<SectionProps>> = {
 /** Sections that use the wide page layout. */
 export const WIDE_SECTIONS = new Set(['about', 'map', 'lab', 'writing'])
 
-export const sectionFor = (id: string) => sections[id] ?? ComingSoon
+/**
+ * Sections whose sub-pages (e.g. /writing/<slug>) are a level down: there the
+ * page's back button returns to the section's index instead of the galaxy.
+ * (About's tabs are sub-routes too, but siblings, so it isn't listed.)
+ */
+export const NESTED_BACK: Record<string, string> = { writing: 'Back to essays' }
+
+export const sectionFor =(id: string) => sections[id] ?? ComingSoon
