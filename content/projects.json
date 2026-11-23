@@ -5,20 +5,40 @@
       "title": "This website",
       "year": "2026",
       "status": "Live",
-      "description": "A personal site disguised as a spaceship: a cockpit intro with a hyperspace jump, and a galaxy map where each section is a procedurally generated star cluster.",
-      "tags": ["React", "Three.js", "React Three Fiber", "TypeScript"],
+      "description": "A personal site containing all you need to know about Talus Leong as he floats through life, not worrying about what comes next.",
+      "tags": [
+        "React",
+        "Three.js",
+        "React Three Fiber",
+        "TypeScript"
+      ],
       "links": [
-        { "label": "Visit", "url": "https://snorelaxrules.github.io" },
-        { "label": "Source", "url": "https://github.com/Snorelaxrules/snorelaxrules.github.io" }
+        {
+          "label": "Visit",
+          "url": "https://snorelaxrules.github.io"
+        },
+        {
+          "label": "Source",
+          "url": "https://github.com/Snorelaxrules/snorelaxrules.github.io"
+        }
       ]
     },
     {
-      "title": "Next experiment",
-      "year": "Soon",
-      "status": "Brewing",
-      "description": "Placeholder card — add real projects to content/projects.json.",
-      "tags": ["TBD"],
-      "links": []
+      "title": "B2B Trainer",
+      "year": "2026",
+      "status": "Live",
+      "description": "A browser Tetris trainer, styled after TETR.IO, for practising spins and back-to-back chains. Press P mid-game and a planner reads your board, hold and queue, then suggests short plans that keep B2B alive.",
+      "tags": [
+        "TypeScript",
+        "Beam search",
+        "Tetris"
+      ],
+      "links": [
+        {
+          "label": "Play",
+          "url": "https://snorelaxrules.github.io/b2btrainer/"
+        }
+      ]
     }
   ]
 }
